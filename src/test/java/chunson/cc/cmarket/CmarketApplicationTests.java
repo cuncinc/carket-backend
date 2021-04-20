@@ -14,7 +14,7 @@ class CmarketApplicationTests
     {
         String phoneNum = TestConfigUtils.getMyPhoneNum();
         System.out.println(phoneNum);
-        if (SmsUtils.sendSms(phoneNum, "001001"))
+        if (SmsUtils.sendSms(phoneNum, "123456"))
         {
             System.out.println("Yes");
         }
