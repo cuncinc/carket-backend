@@ -1,23 +1,22 @@
-package chunson.cc.cmarket.utils;
+package chunson.cc.cmarket.utils.config;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"config/sms-config.properties"}, encoding = "UTF-8")
-class ConfigUtils
+public class AliSmsConfigUtils
 {
-    static String AccessKeyId;
-    static String AccessKeySecrete;
-    static String SignName;
-    static String TemplateCode;
+    private static String AccessKeyId;
+    private static String AccessKeySecrete;
+    private static String SignName;
+    private static String TemplateCode;
 
     @Value("${aliyun_sms_access_key.id}")
     public void setAccessKeyId(String accessKeyId)
     {
-        AccessKeyId=accessKeyId;
+        AccessKeyId = accessKeyId;
     }
 
     @Value("${aliyun_sms_access_key.secrete}")
