@@ -37,3 +37,5 @@ build/
 
 ### config ###
 /src/main/resources/config/*
+/src/main/resources/application.yml
+/src/main/resources/application.properties

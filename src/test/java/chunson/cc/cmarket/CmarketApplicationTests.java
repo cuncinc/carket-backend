@@ -3,6 +3,7 @@ package chunson.cc.cmarket;
 import chunson.cc.cmarket.utils.COSUtils;
 import chunson.cc.cmarket.utils.SmsUtils;
 import chunson.cc.cmarket.utils.TestConfigUtils;
+import chunson.cc.cmarket.utils.config.MysqlConfigUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -66,5 +67,14 @@ class CmarketApplicationTests
         {
             System.out.println("fail!");
         }
+    }
+
+    @Test
+    void testMysqlConfigUtils()
+    {
+        System.out.println(MysqlConfigUtils.getHost());
+        System.out.println(MysqlConfigUtils.getPort());
+        System.out.println(MysqlConfigUtils.getUsername());
+        System.out.println(MysqlConfigUtils.getPassword());
     }
 }
