@@ -14,19 +14,19 @@ class CmarketApplicationTests
 {
     // done!
 //    @Test
-    void testSendSms()
-    {
-        String phoneNum = TestConfigUtils.getMyPhoneNum();
-        System.out.println(phoneNum);
-        if (SmsUtils.sendSms(phoneNum, "123456"))
-        {
-            System.out.println("Yes");
-        }
-        else
-        {
-            System.out.println("No");
-        }
-    }
+//    void testSendSms()
+//    {
+//        String phoneNum = TestConfigUtils.getMyPhoneNum();
+//        System.out.println(phoneNum);
+//        if (SmsUtils.sendSms(phoneNum, "123456"))
+//        {
+//            System.out.println("Yes");
+//        }
+//        else
+//        {
+//            System.out.println("No");
+//        }
+//    }
 
     // done!
 //    @Test

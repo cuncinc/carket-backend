@@ -1,6 +1,7 @@
 package chunson.cc.cmarket;
 
 import chunson.cc.cmarket.utils.PasswordUtils;
+import chunson.cc.cmarket.utils.RedisUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -12,4 +13,10 @@ class UtilsTests
     {
         String md5 = PasswordUtils.md5Password("chunson");
     }
+
+//    @Test
+//    void testRedis()
+//    {
+//        RedisUtils.set("1", "2");
+//    }
 }
