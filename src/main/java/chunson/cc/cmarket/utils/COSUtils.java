@@ -86,7 +86,7 @@ public class COSUtils
         try
         {
             PutObjectResult result = client.putObject(request);
-            System.out.println(result.getETag());   // ETag是对象的MD5值
+            System.out.println("COSObject ETag:  " + result.getETag());   // ETag是对象的MD5值
             return true;
         }
         catch (CosClientException e)

@@ -1,6 +1,6 @@
 package chunson.cc.cmarket;
 
-import chunson.cc.cmarket.utils.StringUtils;
+import chunson.cc.cmarket.utils.PasswordUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -10,6 +10,6 @@ class UtilsTests
     @Test
     void testmd5()
     {
-        String md5 = StringUtils.md5Password("chunson");
+        String md5 = PasswordUtils.md5Password("chunson");
     }
 }

@@ -3,7 +3,7 @@ package chunson.cc.cmarket.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class StringUtils
+public class PasswordUtils
 {
     private final static String[] hexDigits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 

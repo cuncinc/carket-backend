@@ -18,7 +18,7 @@ public class SmsUtils
         config.accessKeySecret = AliSmsConfigUtils.getAccessKeySecrete();
     }
 
-    static public boolean sendSms(String phoneNum, String smsValidateCode)
+    public static boolean sendSms(String phoneNum, String smsValidateCode)
     {
         boolean state = false;
         try

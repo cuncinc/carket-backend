@@ -148,4 +148,19 @@ public class User
     {
         this.wechatId = wechatId;
     }
+
+    @Override
+    public String toString()
+    {
+        return "User{"+
+                "\"userId\":"+userId+","+
+                "\"userName\":"+userName+","+
+                "\"avatarKey\":"+avatarKey+","+
+                "\"avatarUrl\":"+avatarUrl+","+
+                "\"balance\":"+balance+","+
+                "\"phoneNum\":"+phoneNum+","+
+                "\"qqNo\":"+qqNo+","+
+                "\"wechatId\":"+wechatId+""+
+                "}";
+    }
 }
