@@ -13,7 +13,7 @@ import java.io.*;
 class CmarketApplicationTests
 {
     // done!
-    @Test
+//    @Test
     void testSendSms()
     {
         String phoneNum = TestConfigUtils.getMyPhoneNum();
@@ -29,7 +29,7 @@ class CmarketApplicationTests
     }
 
     // done!
-    @Test
+//    @Test
     void testGetCOSObject() throws IOException
     {
         InputStream stream = COSUtils.getAvatarStream("2.jpg");
@@ -39,7 +39,7 @@ class CmarketApplicationTests
 
 
     // done!
-    @Test
+//    @Test
     void testUploadCOSObject() throws FileNotFoundException
     {
         String filePath = "E:\\CC\\Desktop\\2.jpg";
@@ -56,7 +56,7 @@ class CmarketApplicationTests
     }
 
     // done!
-    @Test
+//    @Test
     void testDeleteCOSObject()
     {
         if (COSUtils.deleteAvatar("test.jpg"))

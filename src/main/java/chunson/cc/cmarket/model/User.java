@@ -1,5 +1,7 @@
 package chunson.cc.cmarket.model;
 
+import chunson.cc.cmarket.utils.config.TencentCosConfigUtils;
+import com.mysql.cj.util.StringUtils;
 
 public class User
 {
@@ -7,10 +9,25 @@ public class User
     private String userName;
     private String password;
     private String avatarKey;
+    private String avatarUrl;
     private double balance;
     private String phoneNum;
     private String qqNo;
     private String wechatId;
+
+    private static final String avatarUrlPrefix;
+
+    static
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("https://")
+                .append(TencentCosConfigUtils.getBucketName())
+                .append(".cos.")
+                .append(TencentCosConfigUtils.getRegion())
+                .append(".myqcloud.com/avatar/");
+
+        avatarUrlPrefix = builder.toString();
+    }
 
     public User() {}
 
@@ -63,6 +80,33 @@ public class User
     public void setAvatarKey(String avatarKey)
     {
         this.avatarKey = avatarKey;
+    }
+
+    public void setAvatarUrl(String avatarUrl)
+    {
+    }
+
+    public String getAvatarUrl()
+    {
+        if (!StringUtils.isNullOrEmpty(avatarUrl))
+        {
+            return avatarUrl;
+        }
+        else
+        {
+            if (StringUtils.isNullOrEmpty(avatarKey))
+            {
+                avatarUrl = avatarUrlPrefix + "unknown.jpg";
+            }
+            else
+            {
+                avatarUrl = avatarUrlPrefix + avatarKey;
+            }
+            return avatarUrl;
+        }
+
+//        return avatarUrlPrefix + avatarKey;
+//        return avatarKey;
     }
 
     public double getBalance()
