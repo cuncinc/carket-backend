@@ -11,7 +11,7 @@ public class User
     private String avatarKey;
     private String avatarUrl;
     private double balance;
-    private String phoneNum;
+    private String phoneNo;
     private String qqNo;
     private String wechatId;
 
@@ -31,13 +31,13 @@ public class User
 
     public User() {}
 
-    public User(String userId, String userName, String avatarKey, double balance, String phoneNum, String qqNo, String wechatId)
+    public User(String userId, String username, String avatarKey, double balance, String phoneNo, String qqNo, String wechatId)
     {
         this.userId = userId;
-        this.userName = userName;
+        this.userName = username;
         this.avatarKey = avatarKey;
         this.balance = balance;
-        this.phoneNum = phoneNum;
+        this.phoneNo = phoneNo;
         this.qqNo = qqNo;
         this.wechatId = wechatId;
     }
@@ -119,14 +119,14 @@ public class User
         this.balance = balance;
     }
 
-    public String getPhoneNum()
+    public String getPhoneNo()
     {
-        return phoneNum;
+        return phoneNo;
     }
 
-    public void setPhoneNum(String phoneNum)
+    public void setPhoneNo(String phoneNo)
     {
-        this.phoneNum = phoneNum;
+        this.phoneNo = phoneNo;
     }
 
     public String getQqNo()
@@ -158,7 +158,7 @@ public class User
                 "\"avatarKey\":"+avatarKey+","+
                 "\"avatarUrl\":"+avatarUrl+","+
                 "\"balance\":"+balance+","+
-                "\"phoneNum\":"+phoneNum+","+
+                "\"phoneNum\":"+ phoneNo +","+
                 "\"qqNo\":"+qqNo+","+
                 "\"wechatId\":"+wechatId+""+
                 "}";

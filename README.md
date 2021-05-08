@@ -5,12 +5,12 @@
 | path                  | 紧急 | 完成 | method | return  | 意义                                 |
 | --------------------- | :--: | :--: | :----: | :-----: | :----------------------------------- |
 | /user/loginByPassword |  1   |  √   |  POST  |  token  | 通过手机和密码登录：手机号、密码     |
-| /user/loginByCode     |  1   |      |  POST  |  token  | 通过手机和验证码登录：手机号、验证码 |
-| /user/sendSmsCode     |  1   |      |  GET   |  状态   | 通过手机发送验证码：手机号           |
-| /user/logon           |  1   |      |  POST  | 用户id  | 注册：手机、密码、验证码             |
+| /user/loginByCode     |  1   |  √   |  POST  |  token  | 通过手机和验证码登录：手机号、验证码 |
+| /user/sendSmsCode     |  1   |  √   |  GET   |  状态   | 通过手机发送验证码：手机号           |
+| /user/logon           |  1   |  √   |  POST  | 用户id  | 注册：手机、密码、验证码             |
 | /user/updatePassword  |  2   |      |  POST  |  bool   | 修改密码：id、验证码、密码           |
 | /user/updateAvatar    |  1   |  √   |  POST  |  bool   | 修改头像：id、图片流                 |
-| /user/updateInfo      |  2   |      |  POST  |  bool   | 通过id修改个人信息：name、联系信息   |
+| /user/updateInfo      |  2   |  √   |  POST  |  bool   | 通过id修改个人信息：name、联系信息   |
 | /user/updatePhone     |  2   |      |  POST  |  bool   | 通过id修改手机：旧手机验证码、新手机 |
 | /user/logout          |  2   |      |  POST  |  bool   | 通过id注销：验证码                   |
 | /user/getBalance      |  1   |      |  GET   | balance | 通过id获取余额                       |
