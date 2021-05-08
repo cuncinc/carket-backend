@@ -7,7 +7,6 @@ import chunson.cc.cmarket.utils.COSUtils;
 import chunson.cc.cmarket.utils.PasswordUtils;
 import chunson.cc.cmarket.utils.SmsUtils;
 import chunson.cc.cmarket.utils.TokenUtils;
-import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +30,9 @@ public class UserController
     }
 
     @GetMapping("/getUserById")
-    public User getUserById(Long userId)
+    public Result<User> getUserById(Long userId)
     {
-        return userMapper.getUserById(userId);
+        return Result.success(userMapper.getUserById(userId), null);
     }
 
     @GetMapping("/sendSmsCode")
@@ -67,7 +66,7 @@ public class UserController
             return Result.failure("密码错误");
         }
 
-        return Result.success(tokenUtils.generateToken(user));
+        return Result.success(tokenUtils.generateToken(user), null);
     }
 
     @PostMapping("/loginByCode")
@@ -87,11 +86,11 @@ public class UserController
             return Result.failure("验证码错误或已失效");
         }
 
-        return Result.success(tokenUtils.generateToken(user));
+        return Result.success(tokenUtils.generateToken(user), null);
     }
 
     @GetMapping("/getUserByPhone")
-    public User getUserByPhone(String phone)
+    public Result<User> getUserByPhone(String phone)
     {
         User user = userMapper.getUserByPhone(phone);
 //        if (null == user)
@@ -102,7 +101,7 @@ public class UserController
 //        {
 //            return Result.success(user.toString());
 //        }
-        return user;
+        return Result.success(user, null);
     }
 
     @PostMapping("/updateAvatar")
@@ -115,7 +114,7 @@ public class UserController
         if (COSUtils.uploadAvatar(file.getInputStream(), key))
         {
             if (userMapper.updateAvatarKey(userId, key))
-                return Result.success(null, "修改头像成功");
+                return Result.success("修改头像成功");
         }
 
         return Result.failure("修改头像失败");
@@ -132,18 +131,16 @@ public class UserController
         if (null != userMapper.getUserByPhone(phone))
         {
             return Result.failure("用户已存在");
-        }
-        else if (!SmsUtils.validateSmsCode(phone, code))
+        } else if (!SmsUtils.validateSmsCode(phone, code))
         {
             return Result.failure("验证码错误或已过期");
-        }
-        else if (!userMapper.insertUser(phone, md5Password, phone))
+        } else if (!userMapper.insertUser(phone, md5Password, phone))
         {
             return Result.failure("注册失败");
         }
 
         User user = userMapper.getUserByPhone(phone);
-        return Result.success(user.getUserId());
+        return Result.success(user.getUserId(), null);
     }
 
     @PostMapping("/updateInfo")
@@ -192,5 +189,12 @@ public class UserController
         }
 
         return Result.success("修改个人信息成功");
+    }
+
+    @GetMapping("/refreshToken")
+    public Result refreshToken(HttpServletRequest request)
+    {
+        String token = request.getHeader("token");
+        return Result.success(tokenUtils.refreshToken(token), null);
     }
 }

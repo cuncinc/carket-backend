@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"config/db-config.properties"}, encoding = "UTF-8")
-public class MysqlConfigUtils
+public class MysqlConfig
 {
     private static String host;
     private static int    port;
@@ -16,25 +16,25 @@ public class MysqlConfigUtils
     @Value("${mysql.host}")
     public void setHost(String host)
     {
-        MysqlConfigUtils.host = host;
+        MysqlConfig.host = host;
     }
 
     @Value("${mysql.port}")
     public void setPort(int port)
     {
-        MysqlConfigUtils.port = port;
+        MysqlConfig.port = port;
     }
 
     @Value("${mysql.username}")
     public void setUsername(String username)
     {
-        MysqlConfigUtils.username = username;
+        MysqlConfig.username = username;
     }
 
     @Value("${mysql.password}")
     public void setPassword(String password)
     {
-        MysqlConfigUtils.password = password;
+        MysqlConfig.password = password;
     }
 
     public static String getHost()

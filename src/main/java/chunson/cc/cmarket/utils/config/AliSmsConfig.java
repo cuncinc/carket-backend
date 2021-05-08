@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"config/sms-config.properties"}, encoding = "UTF-8")
-public class AliSmsConfigUtils
+public class AliSmsConfig
 {
     private static String AccessKeyId;
     private static String AccessKeySecrete;

@@ -1,16 +1,14 @@
 package chunson.cc.cmarket.utils;
 
-import chunson.cc.cmarket.utils.config.TencentCosConfigUtils;
+import chunson.cc.cmarket.utils.config.CosConfig;
 import com.qcloud.cos.*;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 
-import java.io.File;
 import java.io.InputStream;
 
 // 腾讯云对象存储
@@ -24,11 +22,11 @@ public class COSUtils
 
     static
     {
-        bucketName = TencentCosConfigUtils.getBucketName();
+        bucketName = CosConfig.getBucketName();
 
-        String secretId = TencentCosConfigUtils.getSecretId();
-        String secretKey = TencentCosConfigUtils.getSecretKey();
-        String regionText = TencentCosConfigUtils.getRegion();
+        String secretId = CosConfig.getSecretId();
+        String secretKey = CosConfig.getSecretKey();
+        String regionText = CosConfig.getRegion();
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
 
         Region region = new Region(regionText);

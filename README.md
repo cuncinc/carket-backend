@@ -22,9 +22,9 @@
 | path                | 紧急 | 完成 | method |  return  | 意义                                                         |
 | ------------------- | :--: | :--: | :----: | :------: | :----------------------------------------------------------- |
 | /goods/release      |  1   |  √   |  POST  |  商品id  | 发布一个商品：用户id、描述、金额、图片、分类                 |
-| /goods/updateInfo   |  1   |      |  POST  |   bool   | 通过id修改商品信息：用户id、商品id、描述、金额、图片(验证用户id) |
+| /goods/updateInfo   |  1   |  √   |  POST  |   bool   | 通过id修改商品信息：用户id、商品id、描述、金额、图片(验证用户id) |
 | /goods/updateStatus |  1   |      |  POST  |   bool   | 通过id修改状态：用户id、商品id、状态                         |
-| /goods/getById      |  1   |      |  GET   |   商品   | 通过id获取商品                                               |
+| /goods/getById      |  1   |  √   |  GET   |   商品   | 通过id获取商品                                               |
 | /goods/getAllByUser |  1   |      |  Get   | 商品列表 | 通过用户id获取所有商品                                       |
 | /goods/             |      |      |        |          |                                                              |
 |                     |      |      |        |          |                                                              |

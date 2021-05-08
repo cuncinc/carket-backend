@@ -1,14 +1,12 @@
 package chunson.cc.cmarket.utils;
 
-import chunson.cc.cmarket.utils.config.AliSmsConfigUtils;
+import chunson.cc.cmarket.utils.config.AliSmsConfig;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.teaopenapi.models.Config;
 import com.mysql.cj.util.StringUtils;
-import org.springframework.cache.annotation.Cacheable;
 
-import java.time.Duration;
 import java.util.Random;
 
 public class SmsUtils
@@ -19,8 +17,8 @@ public class SmsUtils
     static
     {
         config = new Config();
-        config.accessKeyId = AliSmsConfigUtils.getAccessKeyId();
-        config.accessKeySecret = AliSmsConfigUtils.getAccessKeySecrete();
+        config.accessKeyId = AliSmsConfig.getAccessKeyId();
+        config.accessKeySecret = AliSmsConfig.getAccessKeySecrete();
     }
 
     private static boolean sendSms(String phone, String smsValidateCode)
@@ -31,8 +29,8 @@ public class SmsUtils
             Client client = new Client(config);
             SendSmsRequest sendSmsRequest = new SendSmsRequest()
                     .setPhoneNumbers(phone)
-                    .setSignName(AliSmsConfigUtils.getSignName())
-                    .setTemplateCode(AliSmsConfigUtils.getTemplateCode())
+                    .setSignName(AliSmsConfig.getSignName())
+                    .setTemplateCode(AliSmsConfig.getTemplateCode())
                     .setTemplateParam("{\"code\":\"" + smsValidateCode + "\"}");
             SendSmsResponse sendResp = client.sendSms(sendSmsRequest);
             String code = sendResp.body.code;

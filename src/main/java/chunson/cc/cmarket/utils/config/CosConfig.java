@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"config/cos-config.properties"}, encoding = "UTF-8")
-public class TencentCosConfigUtils
+public class CosConfig
 {
     private static String secretId;
     private static String secretKey;
@@ -16,25 +16,25 @@ public class TencentCosConfigUtils
     @Value("${tencent_cos_secret_id}")
     public void setSecretId(String secretId)
     {
-        TencentCosConfigUtils.secretId = secretId;
+        CosConfig.secretId = secretId;
     }
 
     @Value("${tencent_cos_secret_key}")
     public void setSecretKey(String secretKey)
     {
-        TencentCosConfigUtils.secretKey = secretKey;
+        CosConfig.secretKey = secretKey;
     }
 
     @Value("${tencent_cos_region}")
     public void setRegion(String region)
     {
-        TencentCosConfigUtils.region = region;
+        CosConfig.region = region;
     }
 
     @Value("${tencent_cos_bucket_name}")
     public void setBucketName(String bucketName)
     {
-        TencentCosConfigUtils.bucketName = bucketName;
+        CosConfig.bucketName = bucketName;
     }
 
     public static String getSecretId()

@@ -1,6 +1,6 @@
 package chunson.cc.cmarket.model;
 
-import chunson.cc.cmarket.utils.config.TencentCosConfigUtils;
+import chunson.cc.cmarket.utils.config.CosConfig;
 import com.mysql.cj.util.StringUtils;
 
 public class User
@@ -15,18 +15,18 @@ public class User
     private String qqNo;
     private String wechatId;
 
-    private static final String avatarUrlPrefix;
+    private static final String AVATAR_URL_PREFIX;
 
     static
     {
         StringBuilder builder = new StringBuilder();
         builder.append("https://")
-                .append(TencentCosConfigUtils.getBucketName())
+                .append(CosConfig.getBucketName())
                 .append(".cos.")
-                .append(TencentCosConfigUtils.getRegion())
+                .append(CosConfig.getRegion())
                 .append(".myqcloud.com/avatar/");
 
-        avatarUrlPrefix = builder.toString();
+        AVATAR_URL_PREFIX = builder.toString();
     }
 
     public User() {}
@@ -88,25 +88,20 @@ public class User
 
     public String getAvatarUrl()
     {
-        if (!StringUtils.isNullOrEmpty(avatarUrl))
+        updateAvatarUrl();
+        return avatarUrl;
+    }
+
+    public void updateAvatarUrl()
+    {
+        if (StringUtils.isNullOrEmpty(avatarKey))
         {
-            return avatarUrl;
+            avatarUrl = AVATAR_URL_PREFIX + "unknown.jpg";
         }
         else
         {
-            if (StringUtils.isNullOrEmpty(avatarKey))
-            {
-                avatarUrl = avatarUrlPrefix + "unknown.jpg";
-            }
-            else
-            {
-                avatarUrl = avatarUrlPrefix + avatarKey;
-            }
-            return avatarUrl;
+            avatarUrl = AVATAR_URL_PREFIX + avatarKey;
         }
-
-//        return avatarUrlPrefix + avatarKey;
-//        return avatarKey;
     }
 
     public double getBalance()
@@ -152,15 +147,16 @@ public class User
     @Override
     public String toString()
     {
-        return "User{"+
-                "\"userId\":"+userId+","+
-                "\"userName\":"+userName+","+
-                "\"avatarKey\":"+avatarKey+","+
-                "\"avatarUrl\":"+avatarUrl+","+
-                "\"balance\":"+balance+","+
-                "\"phoneNum\":"+ phoneNo +","+
-                "\"qqNo\":"+qqNo+","+
-                "\"wechatId\":"+wechatId+""+
-                "}";
+        return "User{" +
+                "userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", avatarKey='" + avatarKey + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", balance=" + balance +
+                ", phoneNo='" + phoneNo + '\'' +
+                ", qqNo='" + qqNo + '\'' +
+                ", wechatId='" + wechatId + '\'' +
+                '}';
     }
 }
