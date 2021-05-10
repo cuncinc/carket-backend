@@ -7,6 +7,7 @@ import chunson.cc.cmarket.utils.COSUtils;
 import chunson.cc.cmarket.utils.PasswordUtils;
 import chunson.cc.cmarket.utils.SmsUtils;
 import chunson.cc.cmarket.utils.TokenUtils;
+import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +48,7 @@ public class UserController
     }
 
     @PostMapping("/loginByPassword")
-    public Result loginByPassword(@RequestParam Map<String, String> req)
+    public Result loginByPassword(@RequestBody Map<String, String> req)
     {
         String phone = req.get("phone");
         String password = req.get("password");
@@ -70,11 +71,22 @@ public class UserController
     }
 
     @PostMapping("/loginByCode")
-    public Result loginByCode(@RequestParam Map<String, String> req)
+    public Result loginByCode(@RequestBody Map<String,String> req)
     {
         String phone = req.get("phone");
         String code = req.get("code");
+        if (StringUtils.isNullOrEmpty(phone))
+        {
+            System.out.println("phone is null");
+            return Result.failure("手机不能为空");
+        }
+        else if (StringUtils.isNullOrEmpty(code))
+        {
+            System.out.println("code is null");
+            return Result.failure("验证码不能为空");
+        }
 
+        System.out.println(phone + ":  "+ code);
         User user = userMapper.getUserByPhone(phone);
         if (null == user)
         {
@@ -121,7 +133,7 @@ public class UserController
     }
 
     @PostMapping("/logon")
-    public Result logon(@RequestParam Map<String, String> req)
+    public Result logon(@RequestBody Map<String, String> req)
     {
         String phone = req.get("phone");
         String password = req.get("password");
@@ -144,7 +156,7 @@ public class UserController
     }
 
     @PostMapping("/updateInfo")
-    public Result updateInfo(@RequestParam Map<String, String> req, HttpServletRequest request)
+    public Result updateInfo(@RequestBody Map<String, String> req, HttpServletRequest request)
     {
         String token = request.getHeader("token");
         long userId = tokenUtils.getUserIdFromToken(token);

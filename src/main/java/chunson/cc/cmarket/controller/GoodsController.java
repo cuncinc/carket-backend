@@ -30,7 +30,7 @@ public class GoodsController
     }
 
     @PostMapping("/release")
-    public Result<Goods> release(@RequestParam Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
+    public Result<Goods> release(@RequestBody Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
     {
         String token = request.getHeader("token");
         long userId = tokenUtils.getUserIdFromToken(token);
@@ -75,7 +75,7 @@ public class GoodsController
     }
 
     @PostMapping("/updatePic")
-    public Result updatePic(@RequestParam Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
+    public Result updatePic(@RequestBody Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
     {
         String token = request.getHeader("token");
         long userId = tokenUtils.getUserIdFromToken(token);
@@ -103,7 +103,7 @@ public class GoodsController
     }
 
     @PostMapping("/updateInfo")
-    public Result updateInfo(@RequestParam Map<String, String> req, HttpServletRequest request)
+    public Result updateInfo(@RequestBody Map<String, String> req, HttpServletRequest request)
     {
         String token = request.getHeader("token");
         long userId = tokenUtils.getUserIdFromToken(token);
