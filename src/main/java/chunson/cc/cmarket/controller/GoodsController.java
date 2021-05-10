@@ -1,7 +1,9 @@
 package chunson.cc.cmarket.controller;
 
 import chunson.cc.cmarket.mapper.GoodsMapper;
+import chunson.cc.cmarket.model.DisplayGoods;
 import chunson.cc.cmarket.model.Goods;
+import chunson.cc.cmarket.model.ReleaseGoods;
 import chunson.cc.cmarket.model.Result;
 import chunson.cc.cmarket.utils.COSUtils;
 import chunson.cc.cmarket.utils.TokenUtils;
@@ -29,37 +31,6 @@ public class GoodsController
         this.tokenUtils = tokenUtils;
     }
 
-    @PostMapping("/release")
-    public Result<Goods> release(@RequestBody Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
-    {
-        String token = request.getHeader("token");
-        long userId = tokenUtils.getUserIdFromToken(token);
-
-        String desc = req.get("desc");
-        double price = Double.parseDouble(req.get("price"));
-        String category = req.get("category");
-        String key = userId + "_" + System.currentTimeMillis() + ".jpg";
-
-        Goods goods = new Goods();
-        goods.setGoodsDesc(desc);
-        goods.setPrice(price);
-        goods.setPicKey(key);
-        goods.setCategory(category);
-        goods.setSellerId(userId);
-
-        if (!COSUtils.uploadGoodsPic(file.getInputStream(), key))
-        {
-            return Result.failure("图片上传失败");
-        }
-
-        if (!goodsMapper.insertGoods(goods))
-        {
-            return Result.failure("发布商品失败");
-        }
-
-        return Result.success(goods, null);
-    }
-
     @GetMapping("/getAll")
     public Result<List<Goods>> getAll()
     {
@@ -75,11 +46,15 @@ public class GoodsController
     }
 
     @PostMapping("/updatePic")
-    public Result updatePic(@RequestBody Map<String, String> req, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException
+    public Result updatePic(ReleaseGoods info, HttpServletRequest request) throws IOException
     {
         String token = request.getHeader("token");
-        long userId = tokenUtils.getUserIdFromToken(token);
-        long goodsId = Long.parseLong(req.get("goodsId"));
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
+        long goodsId = info.getGoodsId();
         Goods goods = goodsMapper.getGoodsById(goodsId);
         if (goods.getSellerId() != userId)
         {
@@ -88,7 +63,7 @@ public class GoodsController
 
         String key = userId + "_" + System.currentTimeMillis() + ".jpg";
 
-        if (!COSUtils.uploadGoodsPic(file.getInputStream(), key))
+        if (!COSUtils.uploadGoodsPic(info.getFile().getInputStream(), key))
         {
             return Result.failure("图片上传失败");
         }
@@ -106,7 +81,11 @@ public class GoodsController
     public Result updateInfo(@RequestBody Map<String, String> req, HttpServletRequest request)
     {
         String token = request.getHeader("token");
-        long userId = tokenUtils.getUserIdFromToken(token);
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
         long goodsId = Long.parseLong(req.get("goodsId"));
         Goods goods = goodsMapper.getGoodsById(goodsId);
         if (goods.getSellerId() != userId)
@@ -131,6 +110,48 @@ public class GoodsController
         if (!goodsMapper.updateInfo(goods))
         {
             return Result.failure("修改商品失败");
+        }
+
+        return Result.success(goods, null);
+    }
+
+    @GetMapping("/getAllDisplayGoods")
+    public Result getAllDisplayGoods()
+    {
+        List<DisplayGoods> list = goodsMapper.getAllDisplayGoods();
+        return Result.success(list, null);
+    }
+
+    @PostMapping("/release")
+    public Result release(ReleaseGoods info, HttpServletRequest request) throws IOException
+    {
+        String token = request.getHeader("token");
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
+
+        String desc = info.getGoodsDesc();
+        double price = info.getPrice();
+        String category = info.getCategory();
+        String key = userId + "_" + System.currentTimeMillis() + ".jpg";
+
+        Goods goods = new Goods();
+        goods.setGoodsDesc(desc);
+        goods.setPrice(price);
+        goods.setPicKey(key);
+        goods.setCategory(category);
+        goods.setSellerId(userId);
+
+        if (!COSUtils.uploadGoodsPic(info.getFile().getInputStream(), key))
+        {
+            return Result.failure("图片上传失败");
+        }
+
+        if (!goodsMapper.insertGoods(goods))
+        {
+            return Result.failure("发布商品失败");
         }
 
         return Result.success(goods, null);

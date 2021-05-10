@@ -15,19 +15,19 @@ public class Goods
         be_deleted;
     }
 
-    private long goodsId;
-    private long sellerId;
-    private String goodsDesc;
+    long goodsId;
+    long sellerId;
+    String goodsDesc;
 //    private List<String> picKeyList;
 //    private List<String> picUrlList;
-    private String picKey;
-    private String picUrl;
-    private double price;
-    private String category;
-    private GoodState state;
-    private Date releaseTime;
+    String picKey;
+    String picUrl;
+    double price;
+    String category;
+    GoodState state;
+    Date releaseTime;
 
-    private static String PIC_URL_PREFIX;
+    static String PIC_URL_PREFIX;
 
 // todo bug:初始化的时候bucketName和region获取不到，都为空
 
@@ -44,7 +44,7 @@ public class Goods
 //        PIC_URL_PREFIX = builder.toString();
 //    }
 
-    private static void updatePrefix()
+    static void updatePrefix()
     {
         StringBuilder builder = new StringBuilder();
         builder.append("https://")
@@ -52,8 +52,6 @@ public class Goods
                 .append(".cos.")
                 .append(CosConfig.getRegion())
                 .append(".myqcloud.com/goodsPic/");
-        System.out.println("bucketName: " + CosConfig.getBucketName() );
-
         PIC_URL_PREFIX = builder.toString();
     }
 

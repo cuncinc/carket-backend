@@ -1,5 +1,6 @@
 package chunson.cc.cmarket.mapper;
 
+import chunson.cc.cmarket.model.DisplayGoods;
 import chunson.cc.cmarket.model.Goods;
 import org.apache.ibatis.annotations.*;
 
@@ -39,4 +40,7 @@ public interface GoodsMapper
 
     @Update("UPDATE goods SET GoodsDesc = #{goodsDesc}, Price=#{price}, Category=#{category} WHERE GoodsId = #{goodsId}")
     boolean updateInfo(Goods goods);
+
+    @Select("SELECT goods.*, AvatarKey, UserName FROM goods, `user` WHERE SellerId = UserId")
+    List<DisplayGoods> getAllDisplayGoods();
 }

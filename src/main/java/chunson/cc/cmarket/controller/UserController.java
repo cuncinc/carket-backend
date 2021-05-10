@@ -86,7 +86,6 @@ public class UserController
             return Result.failure("验证码不能为空");
         }
 
-        System.out.println(phone + ":  "+ code);
         User user = userMapper.getUserByPhone(phone);
         if (null == user)
         {
@@ -120,9 +119,13 @@ public class UserController
     public Result updateAvatar(@RequestParam MultipartFile file, HttpServletRequest request) throws IOException
     {
         String token = request.getHeader("token");
-        long userId = tokenUtils.getUserIdFromToken(token);
-        String key = userId + ".jpg";
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
 
+        String key = userId + ".jpg";
         if (COSUtils.uploadAvatar(file.getInputStream(), key))
         {
             if (userMapper.updateAvatarKey(userId, key))
@@ -159,7 +162,12 @@ public class UserController
     public Result updateInfo(@RequestBody Map<String, String> req, HttpServletRequest request)
     {
         String token = request.getHeader("token");
-        long userId = tokenUtils.getUserIdFromToken(token);
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
+
         String username = req.get("username");
         String qq = req.get("qq");
         String wechatId = req.get("wechatId");
