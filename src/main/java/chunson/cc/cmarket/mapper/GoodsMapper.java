@@ -43,4 +43,7 @@ public interface GoodsMapper
 
     @Select("SELECT goods.*, AvatarKey, UserName FROM goods, `user` WHERE SellerId = UserId")
     List<DisplayGoods> getAllDisplayGoods();
+
+    @Select("SELECT goods.*, AvatarKey, UserName FROM goods, `user` WHERE GoodsId = #{goodsId} AND SellerId = UserId")
+    DisplayGoods getDisplayGoodsById(long goodsId);
 }

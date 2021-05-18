@@ -154,6 +154,19 @@ public class GoodsController
             return Result.failure("发布商品失败");
         }
 
+        goods = goodsMapper.getDisplayGoodsById(goods.getGoodsId());
         return Result.success(goods, null);
     }
+
+    @GetMapping("/getDisplayGoodsById")
+    public Result getDisplayGoodsById(long goodsId)
+    {
+        DisplayGoods goods = goodsMapper.getDisplayGoodsById(goodsId);
+        if (goods == null)
+        {
+            return Result.failure("没有找到id为"+goodsId+"的商品");
+        }
+        return Result.success(goods, null);
+    }
+
 }

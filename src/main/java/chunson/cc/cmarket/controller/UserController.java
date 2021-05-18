@@ -135,6 +135,50 @@ public class UserController
         return Result.failure("修改头像失败");
     }
 
+    @PostMapping("/logonAndLoginByCode")
+    public Result logonAndLoginByCode(@RequestBody Map<String,String> req)
+    {
+        String phone = req.get("phone");
+        String code = req.get("code");
+        if (StringUtils.isNullOrEmpty(phone))
+        {
+            System.out.println("phone is null");
+            return Result.failure("手机不能为空");
+        }
+        else if (StringUtils.isNullOrEmpty(code))
+        {
+            System.out.println("code is null");
+            return Result.failure("验证码不能为空");
+        }
+
+        if (!SmsUtils.validateSmsCode(phone, code))
+        {
+            return Result.failure("验证码错误或已失效");
+        }
+
+        User user = userMapper.getUserByPhone(phone);
+        if (null == user)
+        {
+            userMapper.insertUser(phone, null, phone);
+            user = userMapper.getUserByPhone(phone);
+        }
+
+        return Result.success(tokenUtils.generateToken(user), null);
+    }
+
+    @GetMapping("/getMeInfo")
+    public Result getMeInfo(HttpServletRequest request)
+    {
+        String token = request.getHeader("token");
+        Long userId = tokenUtils.getUserIdFromToken(token);
+        if (null == userId)
+        {
+            return Result.failure("用户未登录，非法操作，请重新登录");
+        }
+        return Result.success(userMapper.getUserById(userId), null);
+    }
+
+
     @PostMapping("/logon")
     public Result logon(@RequestBody Map<String, String> req)
     {
