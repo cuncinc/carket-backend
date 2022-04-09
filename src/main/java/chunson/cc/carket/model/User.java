@@ -1,162 +1,83 @@
-//package chunson.cc.carket.model;
-//
-//import chunson.cc.carket.utils.config.CosConfig;
-//import com.mysql.cj.util.StringUtils;
-//
-//public class User
-//{
-//    private String userId;
-//    private String userName;
-//    private String password;
-//    private String avatarKey;
-//    private String avatarUrl;
-//    private double balance;
-//    private String phoneNo;
-//    private String qqNo;
-//    private String wechatId;
-//
-//    private static final String AVATAR_URL_PREFIX;
-//
-//    static
-//    {
-//        StringBuilder builder = new StringBuilder();
-//        builder.append("https://")
-//                .append(CosConfig.getBucketName())
-//                .append(".cos.")
-//                .append(CosConfig.getRegion())
-//                .append(".myqcloud.com/avatar/");
-//
-//        AVATAR_URL_PREFIX = builder.toString();
-//    }
-//
-//    public User() {}
-//
-//    public User(String userId, String username, String avatarKey, double balance, String phoneNo, String qqNo, String wechatId)
-//    {
-//        this.userId = userId;
-//        this.userName = username;
-//        this.avatarKey = avatarKey;
-//        this.balance = balance;
-//        this.phoneNo = phoneNo;
-//        this.qqNo = qqNo;
-//        this.wechatId = wechatId;
-//    }
-//
-//    public String getUserId()
-//    {
-//        return userId;
-//    }
-//
-//    public void setUserId(String userId)
-//    {
-//        this.userId = userId;
-//    }
-//
-//    public String getUserName()
-//    {
-//        return userName;
-//    }
-//
-//    public void setUserName(String userName)
-//    {
-//        this.userName = userName;
-//    }
-//
-//    public String getPassword()
-//    {
-//        return password;
-//    }
-//
-//    public void setPassword(String password)
-//    {
-//        this.password = password;
-//    }
-//
-//    public String getAvatarKey()
-//    {
-//        return avatarKey;
-//    }
-//
-//    public void setAvatarKey(String avatarKey)
-//    {
-//        this.avatarKey = avatarKey;
-//    }
-//
-//    public void setAvatarUrl(String avatarUrl)
-//    {
-//    }
-//
-//    public String getAvatarUrl()
-//    {
-//        updateAvatarUrl();
-//        return avatarUrl;
-//    }
-//
-//    public void updateAvatarUrl()
-//    {
-//        if (StringUtils.isNullOrEmpty(avatarKey))
-//        {
-//            avatarUrl = AVATAR_URL_PREFIX + "unknown.jpg";
-//        }
-//        else
-//        {
-//            avatarUrl = AVATAR_URL_PREFIX + avatarKey;
-//        }
-//    }
-//
-//    public double getBalance()
-//    {
-//        return balance;
-//    }
-//
-//    public void setBalance(double balance)
-//    {
-//        this.balance = balance;
-//    }
-//
-//    public String getPhoneNo()
-//    {
-//        return phoneNo;
-//    }
-//
-//    public void setPhoneNo(String phoneNo)
-//    {
-//        this.phoneNo = phoneNo;
-//    }
-//
-//    public String getQqNo()
-//    {
-//        return qqNo;
-//    }
-//
-//    public void setQqNo(String qqNo)
-//    {
-//        this.qqNo = qqNo;
-//    }
-//
-//    public String getWechatId()
-//    {
-//        return wechatId;
-//    }
-//
-//    public void setWechatId(String wechatId)
-//    {
-//        this.wechatId = wechatId;
-//    }
-//
-//    @Override
-//    public String toString()
-//    {
-//        return "User{" +
-//                "userId='" + userId + '\'' +
-//                ", userName='" + userName + '\'' +
-//                ", password='" + password + '\'' +
-//                ", avatarKey='" + avatarKey + '\'' +
-//                ", avatarUrl='" + avatarUrl + '\'' +
-//                ", balance=" + balance +
-//                ", phoneNo='" + phoneNo + '\'' +
-//                ", qqNo='" + qqNo + '\'' +
-//                ", wechatId='" + wechatId + '\'' +
-//                '}';
-//    }
-//}
+package chunson.cc.carket.model;
+
+public class User
+{
+    private String address;
+    private String username;
+    private String avatarLink;
+    private String joinedTime;
+    private String email;
+    private String bio;
+
+    public User(){}
+
+    public User(String address, String username, String avatarLink, String joinedTime, String email, String bio)
+    {
+        this.address = address;
+        this.username = username;
+        this.avatarLink = avatarLink;
+        this.joinedTime = joinedTime;
+        this.email = email;
+        this.bio = bio;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
+
+    public String getAvatarLink()
+    {
+        return avatarLink;
+    }
+
+    public void setAvatarLink(String avatarLink)
+    {
+        this.avatarLink = avatarLink;
+    }
+
+    public String getJoinedTime()
+    {
+        return joinedTime;
+    }
+
+    public void setJoinedTime(String joinedTime)
+    {
+        this.joinedTime = joinedTime;
+    }
+
+    public String getEmail()
+    {
+        return email;
+    }
+
+    public void setEmail(String email)
+    {
+        this.email = email;
+    }
+
+    public String getBio()
+    {
+        return bio;
+    }
+
+    public void setBio(String bio)
+    {
+        this.bio = bio;
+    }
+}

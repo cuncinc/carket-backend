@@ -1,9 +1,7 @@
 package chunson.cc.carket.controller;
 
-import chunson.cc.carket.mapper.AccountMapper;
-import chunson.cc.carket.model.Account;
 import chunson.cc.carket.model.Result;
-import chunson.cc.carket.utils.PswUtils;
+import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +14,18 @@ import java.util.Map;
 @RequestMapping("/")
 public class AccountController
 {
-    private AccountMapper mapper;
-    private TokenUtils tokenUtils;
-
     @Autowired
-    public AccountController(AccountMapper mapper, TokenUtils tokenUtils)
-    {
-        this.mapper = mapper;
-        this.tokenUtils = tokenUtils;
-    }
+    private AccountService service;
 
     @GetMapping("/account")
 //    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="用户名已被占用")
-    public Result<?> isNullOrEmpty(@RequestParam Map<String, String> req)
+    public Result<?> existsAccount(@RequestParam Map<String, String> req)
     {
         @NotNull String username = req.get("username");
-        if (!mapper.existsAccount(username))
-        {
-            return new Result<>();
-        }
-        else
-        {
-            return new Result<Error>(HttpStatus.NOT_FOUND);
-        }
+        if (!service.existsAccount(username))
+            return new Result();
+
+        return new Result<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/account")
@@ -48,17 +35,10 @@ public class AccountController
         @NotNull String username = req.get("username");
         @NotNull String password = req.get("password");
 
-        String hash = PswUtils.hashPassword(password);
-        System.out.println(hash);
-        Account account = new Account(username, username, hash, password);
-        if (mapper.insertAccount(account))
-        {
-            return new Result<>(account, HttpStatus.CREATED);
-        }
-        else
-        {
-            return new Result<>(HttpStatus.NOT_FOUND);
-        }
+        if (service.logon(username, password))
+            return new Result(HttpStatus.CREATED);
+
+        return new Result<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/account")
@@ -67,11 +47,8 @@ public class AccountController
         if (!TokenUtils.isTokenExpired(token))
         {
             String address = TokenUtils.getAddressFromToken(token);
-            Account account = mapper.getAccountByAddress(address);
-
             @NotNull String password = req.get("password");
-            if (PswUtils.checkPassword(password, account.getPswHash())
-                && mapper.deleteAccount(address))
+            if (service.deleteAccount(address, password))
             {
                 return new Result();
             }
@@ -81,19 +58,14 @@ public class AccountController
     }
 
     @PutMapping("/account")
-    public Result<?> changePassword(@RequestBody Map<String, String> req, @CookieValue("token") String token)
+    public Result<?> updatePassword(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
         if (!TokenUtils.isTokenExpired(token))
         {
             String address = TokenUtils.getAddressFromToken(token);
-            Account account = mapper.getAccountByAddress(address);
-
             @NotNull String oldPassword = req.get("old_psw");
             @NotNull String newPassword = req.get("new_psw");
-            String newPswHash = PswUtils.hashPassword(newPassword);
-
-            if (PswUtils.checkPassword(oldPassword, account.getPswHash())
-               && mapper.updatePswHash(address, newPswHash))
+            if (service.updatePassword(address, oldPassword, newPassword))
             {
                return new Result();
             }
@@ -108,26 +80,18 @@ public class AccountController
         @NotNull String username = req.get("username");
         @NotNull String password = req.get("password");
 
-        Account account = mapper.getAccountByName(username);
-        if (PswUtils.checkPassword(password, account.getPswHash()))
-        {
-            String token = TokenUtils.generateToken(username);
+        String token = service.login(username, password);
+
+        if (token != null)
             return new Result<>(token, HttpStatus.CREATED);
-        }
-        else
-        {
-            return new Result(HttpStatus.NOT_FOUND);
-        }
+
+        return new Result<>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/session")
     public Result<?> logout(@CookieValue("token") String token)
     {
-        String address = TokenUtils.getAddressFromToken(token);
-        System.out.println("logout: " + address);
-
-        //todo 使用redis屏蔽掉token
-
+        service.logout(token);
         return new Result();
     }
 }

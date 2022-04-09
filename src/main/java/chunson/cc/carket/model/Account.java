@@ -6,6 +6,7 @@ public class Account
     private String username;
     private String pswHash;
     private String salt;
+    private double balance;
 
     public Account(){}
 
@@ -17,15 +18,14 @@ public class Account
         this.salt = salt;
     }
 
-    public Account(String address, String pswHash, String salt)
+    public Account(String address, String username, String pswHash, String salt, double balance)
     {
         this.address = address;
-        this.username = address;
+        this.username = username;
         this.pswHash = pswHash;
         this.salt = salt;
+        this.balance = balance;
     }
-
-
 
     public String getAddress()
     {
@@ -65,5 +65,15 @@ public class Account
     public void setSalt(String salt)
     {
         this.salt = salt;
+    }
+
+    public double getBalance()
+    {
+        return balance;
+    }
+
+    public void setBalance(double balance)
+    {
+        this.balance = balance;
     }
 }
