@@ -1,4 +1,4 @@
-package chunson.cc.cmarket.utils;
+package chunson.cc.carket.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;

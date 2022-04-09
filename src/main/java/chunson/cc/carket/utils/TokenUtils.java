@@ -1,6 +1,6 @@
-package chunson.cc.cmarket.utils;
+package chunson.cc.carket.utils;
 
-import chunson.cc.cmarket.model.User;
+import chunson.cc.carket.model.Account;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,8 +15,8 @@ import java.util.Map;
 @Component
 public class TokenUtils implements Serializable
 {
-    private String secret;//密钥
-    private Long validate_time; //过期时间
+    private static String secret;//密钥
+    private static Long validate_time; //过期时间
     private String header;
 
 //    public String getHeader()
@@ -35,13 +35,13 @@ public class TokenUtils implements Serializable
     }
 
     //用于生成token
-    private String generateToken(Map<String, Object> claims)
+    private static String generateToken(Map<String, Object> claims)
     {
         Date expirationDate = new Date((new Date()).getTime() + validate_time);
         return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    private Claims getClaimsFromToken(String token)
+    private static Claims getClaimsFromToken(String token)
     {
         Claims claims;
         claims = Jwts.parser()
@@ -51,24 +51,24 @@ public class TokenUtils implements Serializable
         return claims;
     }
 
-    public String generateToken(User user)
+    public static String generateToken(String address)
     {
         Map<String, Object> cliams = new HashMap<>();
-        cliams.put("sub", user.getUserId());
+        cliams.put("sub", address);
         cliams.put("created", new Date());
         return generateToken(cliams);
     }
 
-    public Long getUserIdFromToken(String token)
+    public static String getAddressFromToken(String token)
     {
-        String userId;
+        String address;
         Claims claims = getClaimsFromToken(token);
         if (claims == null) return null;
-        userId = claims.getSubject();
-        return Long.parseLong(userId);
+        address = claims.getSubject();
+        return address;
     }
 
-    public Boolean isTokenExpired(String token)
+    public static boolean isTokenExpired(String token)
     {
         Claims claims = getClaimsFromToken(token);
         if (claims == null) return false;
@@ -76,7 +76,7 @@ public class TokenUtils implements Serializable
         return expiration.before(new Date());
     }
 
-    public String refreshToken(String token)
+    public static String refreshToken(String token)
     {
         String refreshToken;
         Claims claims = getClaimsFromToken(token);
@@ -92,10 +92,10 @@ public class TokenUtils implements Serializable
      * @param Token
      * @return
      */
-    public Boolean validateToken(String Token, User user)
-    {
-        Long userId = getUserIdFromToken(Token);
-        if (userId == null) return false;
-        return (userId.equals(user.getUserId())) && !isTokenExpired(Token);
-    }
+//    public Boolean validateToken(String Token, User user)
+//    {
+//        Long userId = getUserIdFromToken(Token);
+//        if (userId == null) return false;
+//        return (userId.equals(user.getUserId())) && !isTokenExpired(Token);
+//    }
 }

@@ -1,4 +1,4 @@
-package chunson.cc.cmarket.utils.config;
+package chunson.cc.carket.utils.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
