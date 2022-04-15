@@ -47,13 +47,16 @@ public class AccountService
         return (checkAccount(address, oldPassword) && mapper.updatePswHash(address, newPswHash));
     }
 
-    public String login(String username, String password)
+    public String login(@NotNull String username, @NotNull String password)
     {
-        Account account = mapper.getAccountByName(username);
-        String address = account.getAddress();
-        if (checkAccount(address, password))
+        if (mapper.existsAccount(username))
         {
-            return TokenUtils.generateToken(address);
+            Account account = mapper.getAccountByName(username);
+            String address = account.getAddress();
+            if (checkAccount(address, password))
+            {
+                return TokenUtils.generateToken(address);
+            }
         }
 
         return null;
@@ -61,8 +64,25 @@ public class AccountService
 
     public void logout(String token)
     {
-        String address = TokenUtils.getAddressFromToken(token);
+        String address = TokenUtils.getAddress(token);
 
         //todo 使用redis屏蔽掉token
+    }
+
+    public String updateToken(@NotNull String token)
+    {
+        if (!TokenUtils.isTokenExpired(token))
+        {
+            return TokenUtils.refreshToken(token);
+        }
+
+        return null;
+    }
+
+    //只能查询自己的余额，并且需要登录
+    public double getBalance(String token)
+    {
+        @NotNull String address = TokenUtils.getAddress(token);
+        return mapper.getBalance(address);
     }
 }

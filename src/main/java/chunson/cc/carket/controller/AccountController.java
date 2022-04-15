@@ -44,9 +44,12 @@ public class AccountController
     @DeleteMapping("/account")
     public Result<?> deleteAccount(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
+        if (token.equals(""))
+            return new Result<>(HttpStatus.BAD_REQUEST);
+
         if (!TokenUtils.isTokenExpired(token))
         {
-            String address = TokenUtils.getAddressFromToken(token);
+            String address = TokenUtils.getAddress(token);
             @NotNull String password = req.get("password");
             if (service.deleteAccount(address, password))
             {
@@ -60,9 +63,12 @@ public class AccountController
     @PutMapping("/account")
     public Result<?> updatePassword(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
+        if (token.equals(""))
+            return new Result<>(HttpStatus.BAD_REQUEST);
+
         if (!TokenUtils.isTokenExpired(token))
         {
-            String address = TokenUtils.getAddressFromToken(token);
+            String address = TokenUtils.getAddress(token);
             @NotNull String oldPassword = req.get("old_psw");
             @NotNull String newPassword = req.get("new_psw");
             if (service.updatePassword(address, oldPassword, newPassword))
@@ -93,5 +99,27 @@ public class AccountController
     {
         service.logout(token);
         return new Result();
+    }
+
+    @PutMapping("/session")
+    public Result<?> updateToken(@NotNull @CookieValue("token") String token)
+    {
+        if (token.equals(""))
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        String newToken = service.updateToken(token);
+        if (newToken != null)
+        {
+            return new Result<>(newToken);
+        }
+        return new Result(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/session")
+    public Result<?> checkToken(@NotNull @CookieValue("token") String token)
+    {
+        if (!TokenUtils.isTokenExpired(token))
+            return new Result<>();
+
+        return new Result(HttpStatus.UNAUTHORIZED);
     }
 }

@@ -1,100 +1,71 @@
 package chunson.cc.carket.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 
 @Component
-public class TokenUtils implements Serializable
+public class FileUtils
 {
-    private static String secret;//密钥
-    private static Long validate_time; //过期时间
-    private String header;
+    private static final String AVATAR_PRE = "avatar/";
+    private static final String ASSETS_PRE = "assets/";
+    private static String resourcePath;
 
-    public TokenUtils(@Value("${jwt.secret}") String secret,
-                      @Value("${jwt.token-validity-in-seconds}") Long time,
-                      @Value(("${jwt.header}")) String header)
+    public FileUtils(@Value("${file.resourcePath}") String resourcePath)
     {
-        this.secret = secret;
-        this.validate_time = time * 1000;
-        this.header = header;
+        FileUtils.resourcePath = resourcePath;
     }
 
-    //用于生成token
-    private static String generateToken(Map<String, Object> claims)
+    public static String storeAvatar(MultipartFile file)
     {
-        Date expirationDate = new Date((new Date()).getTime() + validate_time);
-        return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
+        return storeFile(file, AVATAR_PRE);
     }
 
-    private static Claims getClaims(String token)
+    public static String storeAssets(MultipartFile file)
     {
-        Claims claims;
-        claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims;
+        return storeFile(file, ASSETS_PRE);
     }
 
-    public static String generateToken(String address)
+    private static String storeFile(MultipartFile file, String pre)
     {
-        Map<String, Object> cliams = new HashMap<>();
-        cliams.put("sub", address);
-        cliams.put("created", new Date());
-        return generateToken(cliams);
+        String name = file.getOriginalFilename();
+        String type = name.substring(name.lastIndexOf('.'));
+        String md5 = getFileHash(file);
+        String route = pre + md5 + type;
+        String filename = resourcePath + route;
+        File storedFile = new File(filename);
+        try
+        {
+            file.transferTo(storedFile);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return route;
     }
 
-    public static String getAddress(String token)
+    public static String getFileHash(MultipartFile file)
     {
-//        if (isTokenExpired(token))
-//        {
-//            return null;
-//        }
-
-        Claims claims = getClaims(token);
-        if (claims == null) return null;
-        return claims.getSubject();
+        try
+        {
+            //获取文件的byte信息
+            byte[] uploadBytes = file.getBytes();
+            // 拿到一个MD5转换器
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            byte[] digest = md5.digest(uploadBytes);
+            //转换为16进制
+            return new BigInteger(1, digest).toString(16);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
-
-    /**
-     * @return 过期返回true，否则返回false
-     */
-    public static boolean isTokenExpired(String token)
-    {
-        Claims claims = getClaims(token);
-        if (claims == null) return true;
-        Date expiration = claims.getExpiration();
-        return expiration.before(new Date());
-    }
-
-    public static String refreshToken(String token)
-    {
-        String newToken;
-        Claims claims = getClaims(token);
-        if (claims == null) return null;
-        claims.put("created", new Date());
-        newToken = generateToken(claims);
-        return newToken;
-    }
-
-    /**
-     * 用于校验Token是否过期
-     *
-     * @param Token
-     * @return
-     */
-//    public Boolean validateToken(String Token, User user)
-//    {
-//        Long userId = getUserIdFromToken(Token);
-//        if (userId == null) return false;
-//        return (userId.equals(user.getUserId())) && !isTokenExpired(Token);
-//    }
 }

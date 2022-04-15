@@ -1,10 +1,12 @@
 package chunson.cc.carket.model;
 
+import chunson.cc.carket.utils.ConfigUtils;
+
 public class User
 {
     private String address;
     private String username;
-    private String avatarLink;
+    private String avatarRoute;
     private String joinedTime;
     private String email;
     private String bio;
@@ -15,7 +17,7 @@ public class User
     {
         this.address = address;
         this.username = username;
-        this.avatarLink = avatarLink;
+        this.avatarRoute = avatarLink;
         this.joinedTime = joinedTime;
         this.email = email;
         this.bio = bio;
@@ -43,12 +45,17 @@ public class User
 
     public String getAvatarLink()
     {
-        return avatarLink;
+        return ConfigUtils.getResourceUrlPre() + avatarRoute;
     }
 
-    public void setAvatarLink(String avatarLink)
+    public String getAvatarRoute()
     {
-        this.avatarLink = avatarLink;
+        return avatarRoute;
+    }
+
+    public void setAvatarRoute(String avatarRoute)
+    {
+        this.avatarRoute = avatarRoute;
     }
 
     public String getJoinedTime()

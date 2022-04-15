@@ -1,6 +1,5 @@
 package chunson.cc.carket.utils;
 
-import chunson.cc.carket.model.Account;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,12 +18,6 @@ public class TokenUtils implements Serializable
     private static Long validate_time; //过期时间
     private String header;
 
-//    public String getHeader()
-//    {
-//        return header;
-//    }
-
-
     public TokenUtils(@Value("${jwt.secret}") String secret,
                       @Value("${jwt.token-validity-in-seconds}") Long time,
                       @Value(("${jwt.header}")) String header)
@@ -41,7 +34,7 @@ public class TokenUtils implements Serializable
         return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    private static Claims getClaimsFromToken(String token)
+    private static Claims getClaims(String token)
     {
         Claims claims;
         claims = Jwts.parser()
@@ -59,31 +52,37 @@ public class TokenUtils implements Serializable
         return generateToken(cliams);
     }
 
-    public static String getAddressFromToken(String token)
+    public static String getAddress(String token)
     {
-        String address;
-        Claims claims = getClaimsFromToken(token);
+//        if (isTokenExpired(token))
+//        {
+//            return null;
+//        }
+
+        Claims claims = getClaims(token);
         if (claims == null) return null;
-        address = claims.getSubject();
-        return address;
+        return claims.getSubject();
     }
 
+    /**
+     * @return 过期返回true，否则返回false
+     */
     public static boolean isTokenExpired(String token)
     {
-        Claims claims = getClaimsFromToken(token);
-        if (claims == null) return false;
+        Claims claims = getClaims(token);
+        if (claims == null) return true;
         Date expiration = claims.getExpiration();
         return expiration.before(new Date());
     }
 
     public static String refreshToken(String token)
     {
-        String refreshToken;
-        Claims claims = getClaimsFromToken(token);
+        String newToken;
+        Claims claims = getClaims(token);
         if (claims == null) return null;
         claims.put("created", new Date());
-        refreshToken = generateToken(claims);
-        return refreshToken;
+        newToken = generateToken(claims);
+        return newToken;
     }
 
     /**

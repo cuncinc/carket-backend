@@ -6,18 +6,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(value = {"config/test-config.properties"})
-public class TestConfigUtils
+public class ConfigUtils
 {
-    static String myPhoneNum;
+    private static String resourceUrlPre;
 
-    @Value("${my.phone}")
-    public void setMyPhoneNum(String myPhoneNum)
+    @Value("${my.urlPrefix}")
+    public void setResourceUrlPre(String resourceUrlPre)
     {
-        TestConfigUtils.myPhoneNum = myPhoneNum;
+        ConfigUtils.resourceUrlPre = resourceUrlPre;
     }
 
-    public static String getMyPhoneNum()
+    public static String getResourceUrlPre()
     {
-        return myPhoneNum;
+        return resourceUrlPre;
     }
 }

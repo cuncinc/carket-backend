@@ -2,7 +2,9 @@ package chunson.cc.carket.mapper;
 
 import chunson.cc.carket.model.Account;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Component;
 
+@Component
 @Mapper
 public interface AccountMapper
 {
@@ -23,4 +25,11 @@ public interface AccountMapper
 
     @Delete("DELETE FROM Account WHERE Address = #{address};")
     boolean deleteAccount(String address);
+
+    // 更新余额不应在Account里，而应新建一个controller
+//    @Update("UPDATE Account SET Balance = Balance + #{price} WHERE Address = #{address};")
+//    boolean updateBalance(String address, double price);
+
+    @Select("SELECT Balance FROM Account WHERE Address = #{address};")
+    double getBalance(String address);
 }
