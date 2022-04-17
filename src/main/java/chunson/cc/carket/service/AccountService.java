@@ -71,7 +71,7 @@ public class AccountService
 
     public String updateToken(@NotNull String token)
     {
-        if (!TokenUtils.isTokenExpired(token))
+        if (TokenUtils.isTokenOK(token))
         {
             return TokenUtils.refreshToken(token);
         }

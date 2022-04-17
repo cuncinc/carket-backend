@@ -48,7 +48,7 @@ public class AccountController
         if (token.equals(""))
             return new Result<>(HttpStatus.BAD_REQUEST);
 
-        if (!TokenUtils.isTokenExpired(token))
+        if (TokenUtils.isTokenOK(token))
         {
             String address = TokenUtils.getAddress(token);
             @NotNull String password = req.get("password");
@@ -67,7 +67,7 @@ public class AccountController
         if (token.equals(""))
             return new Result<>(HttpStatus.BAD_REQUEST);
 
-        if (!TokenUtils.isTokenExpired(token))
+        if (TokenUtils.isTokenOK(token))
         {
             String address = TokenUtils.getAddress(token);
             @NotNull String oldPassword = req.get("old_psw");
@@ -111,10 +111,13 @@ public class AccountController
     {
         if (token.equals(""))
             return new Result<>(HttpStatus.BAD_REQUEST);
+
         String newToken = service.updateToken(token);
         if (newToken != null)
         {
-            return new Result<>(newToken);
+            Map<String, String> map = new HashMap<>();
+            map.put("newToken", newToken);
+            return new Result<>(map);
         }
         return new Result(HttpStatus.UNAUTHORIZED);
     }
@@ -122,7 +125,7 @@ public class AccountController
     @GetMapping("/session")
     public Result<?> checkToken(@NotNull @CookieValue("token") String token)
     {
-        if (!TokenUtils.isTokenExpired(token))
+        if (TokenUtils.isTokenOK(token))
             return new Result<>();
 
         return new Result(HttpStatus.UNAUTHORIZED);

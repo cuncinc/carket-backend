@@ -1,6 +1,7 @@
 package chunson.cc.carket.utils;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,23 +28,6 @@ public class TokenUtils implements Serializable
         this.header = header;
     }
 
-    //用于生成token
-    private static String generateToken(Map<String, Object> claims)
-    {
-        Date expirationDate = new Date((new Date()).getTime() + validate_time);
-        return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
-    }
-
-    private static Claims getClaims(String token)
-    {
-        Claims claims;
-        claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims;
-    }
-
     public static String generateToken(String address)
     {
         Map<String, Object> cliams = new HashMap<>();
@@ -54,25 +38,34 @@ public class TokenUtils implements Serializable
 
     public static String getAddress(String token)
     {
-//        if (isTokenExpired(token))
-//        {
-//            return null;
-//        }
-
-        Claims claims = getClaims(token);
-        if (claims == null) return null;
-        return claims.getSubject();
+        try
+        {
+            Claims claims = getClaims(token);
+            if (claims == null) return null;
+            return claims.getSubject();
+        }
+        catch (ExpiredJwtException e)
+        {
+            return null;
+        }
     }
 
     /**
      * @return 过期返回true，否则返回false
      */
-    public static boolean isTokenExpired(String token)
+    public static boolean isTokenOK(String token)
     {
-        Claims claims = getClaims(token);
-        if (claims == null) return true;
-        Date expiration = claims.getExpiration();
-        return expiration.before(new Date());
+        try
+        {
+            Claims claims = getClaims(token);
+            if (claims == null) return false;
+            Date expiration = claims.getExpiration();
+            return !expiration.before(new Date());
+        }
+        catch (ExpiredJwtException e)
+        {
+            return false;
+        }
     }
 
     public static String refreshToken(String token)
@@ -85,16 +78,19 @@ public class TokenUtils implements Serializable
         return newToken;
     }
 
-    /**
-     * 用于校验Token是否过期
-     *
-     * @param Token
-     * @return
-     */
-//    public Boolean validateToken(String Token, User user)
-//    {
-//        Long userId = getUserIdFromToken(Token);
-//        if (userId == null) return false;
-//        return (userId.equals(user.getUserId())) && !isTokenExpired(Token);
-//    }
+    private static String generateToken(Map<String, Object> claims)
+    {
+        Date expirationDate = new Date((new Date()).getTime() + validate_time);
+        return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
+    }
+
+    private static Claims getClaims(String token) throws ExpiredJwtException
+    {
+        Claims claims;
+        claims = Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims;
+    }
 }

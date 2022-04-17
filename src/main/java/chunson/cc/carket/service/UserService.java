@@ -3,6 +3,7 @@ package chunson.cc.carket.service;
 import chunson.cc.carket.mapper.UserMapper;
 import chunson.cc.carket.model.User;
 import chunson.cc.carket.utils.FileUtils;
+import chunson.cc.carket.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,8 @@ public class UserService
 
     public User getUserByAddress(String address)
     {
-        return mapper.getUserByAddress(address);
+        User user = mapper.getUserByAddress(address);
+        return user;
     }
 
     public boolean updateUser(String address, Map<String ,String> req)

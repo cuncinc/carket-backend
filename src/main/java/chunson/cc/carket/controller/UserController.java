@@ -22,16 +22,35 @@ public class UserController
     private UserService userService;
 
     @GetMapping("/user/{address}")
-    public Result<?> isNullOrEmpty(@RequestParam Map<String, String> req, @PathVariable String address)
+    public Result<?> getUser(@PathVariable String address)
     {
         User user = userService.getUserByAddress(address);
-        return new Result<>(user);
+        if (user != null)
+            return new Result<>(user);
+
+        return new Result<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/user")
+    public Result<?> getMe(@CookieValue("token") String token)
+    {
+        String address = TokenUtils.getAddress(token);
+        if (address != null)
+        {
+            User me = userService.getUserByAddress(address);
+            if (me != null)
+                return new Result<>(me);
+        }
+
+        return new Result<>(HttpStatus.UNAUTHORIZED);
     }
 
     @PutMapping("/user")
     public Result<?> updateUser(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
         String address = TokenUtils.getAddress(token);
+        if (address == null)
+            return new Result(HttpStatus.UNAUTHORIZED);
 
         if (userService.updateUser(address, req))
             return new Result();
@@ -42,6 +61,10 @@ public class UserController
     public Result<?> updateAvatar(@NotNull @RequestParam("file") MultipartFile file, @CookieValue("token") String token, @NotNull @PathVariable String type)
     {
         String address = TokenUtils.getAddress(token);
+        if (null == address)
+        {
+            return new Result(HttpStatus.UNAUTHORIZED);
+        }
         String key = type + "Link";
         UserService.ImgType imgType;
         if (type.equals("avatar"))
