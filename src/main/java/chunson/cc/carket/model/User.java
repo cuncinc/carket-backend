@@ -7,6 +7,7 @@ public class User
     private String address;
     private String username;
     private String avatarRoute;
+    private String coverRoute;
     private String joinedTime;
     private String email;
     private String bio;
@@ -56,6 +57,21 @@ public class User
     public void setAvatarRoute(String avatarRoute)
     {
         this.avatarRoute = avatarRoute;
+    }
+
+    public String getCoverLink()
+    {
+        return ConfigUtils.getResourceUrlPre() + coverRoute;
+    }
+
+    public String getCoverRoute()
+    {
+        return coverRoute;
+    }
+
+    public void setCoverRoute(String coverRoute)
+    {
+        this.coverRoute = coverRoute;
     }
 
     public String getJoinedTime()

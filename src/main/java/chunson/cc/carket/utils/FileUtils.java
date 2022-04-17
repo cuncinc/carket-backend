@@ -14,6 +14,7 @@ public class FileUtils
 {
     private static final String AVATAR_PRE = "avatar/";
     private static final String ASSETS_PRE = "assets/";
+    private static final String COVER_PRE = "cover/";
     private static String resourcePath;
 
     public FileUtils(@Value("${file.resourcePath}") String resourcePath)
@@ -24,6 +25,11 @@ public class FileUtils
     public static String storeAvatar(MultipartFile file)
     {
         return storeFile(file, AVATAR_PRE);
+    }
+
+    public static String storeCover(MultipartFile file)
+    {
+        return storeFile(file, COVER_PRE);
     }
 
     public static String storeAssets(MultipartFile file)

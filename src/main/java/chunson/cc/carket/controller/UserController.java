@@ -4,12 +4,14 @@ import chunson.cc.carket.model.Result;
 import chunson.cc.carket.model.User;
 import chunson.cc.carket.service.UserService;
 import chunson.cc.carket.utils.TokenUtils;
+import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -36,14 +38,35 @@ public class UserController
         return new Result(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/user/avatar")
-    public Result<?> updateAvatar(@RequestParam("avatar") MultipartFile file, @CookieValue("token") String token) throws IOException
+    @PutMapping("/user/{type}")
+    public Result<?> updateAvatar(@NotNull @RequestParam("file") MultipartFile file, @CookieValue("token") String token, @NotNull @PathVariable String type)
     {
         String address = TokenUtils.getAddress(token);
-        String route = userService.updateAvatar(address, file);
-        if (route != null)
-            return new Result<>(route);
+        String key = type + "Link";
+        UserService.ImgType imgType;
+        if (type.equals("avatar"))
+        {
+            imgType = UserService.ImgType.Avatar;
+        }
+        else if (type.equals("cover"))
+        {
+            imgType = UserService.ImgType.Cover;
+        }
+        else//路径既不是avatar也不是cover，错误路径
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
 
-        return new Result(HttpStatus.UNAUTHORIZED);
+        String link = userService.updateImgResource(address, file, imgType);
+        if (link != null)
+        {
+            Map<String, String> map = new HashMap<>();
+            map.put(key, link);
+            return new Result<>(map);
+        }
+        else//不能更新，address错误，未授权
+        {
+            return new Result<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 }

@@ -12,6 +12,11 @@ import java.util.Map;
 @Service
 public class UserService
 {
+    public enum ImgType{
+        Avatar,
+        Cover,
+    }
+
     @Autowired
     private UserMapper mapper;
 
@@ -24,18 +29,30 @@ public class UserService
     {
         User user = getUserByAddress(address);
         if(req.containsKey("username")) user.setUsername(req.get("username"));
-        if(req.containsKey("email")) user.setUsername(req.get("email"));
-        if(req.containsKey("bio")) user.setUsername(req.get("bio"));
+        if(req.containsKey("email")) user.setEmail(req.get("email"));
+        if(req.containsKey("bio")) user.setBio(req.get("bio"));
         return mapper.updateUser(user);
     }
 
-    public String updateAvatar(String address, MultipartFile avatar)
+    public String updateImgResource(String address, MultipartFile imgFile, ImgType type)
     {
-        String route = FileUtils.storeAvatar(avatar);
+        String route;
         User user = mapper.getUserByAddress(address);
-        user.setAvatarRoute(route);
-        if (mapper.updateUser(user))
-            return user.getAvatarLink();
+        switch (type)
+        {
+            case Avatar:
+                route = FileUtils.storeAvatar(imgFile);
+                user.setAvatarRoute(route);
+                if (mapper.updateUser(user))
+                    return user.getAvatarLink();
+                break;
+            case Cover:
+                route = FileUtils.storeCover(imgFile);
+                user.setCoverRoute(route);
+                if (mapper.updateUser(user))
+                    return user.getCoverLink();
+                break;
+        }
 
         return null;
     }

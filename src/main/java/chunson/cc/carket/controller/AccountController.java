@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -89,7 +90,11 @@ public class AccountController
         String token = service.login(username, password);
 
         if (token != null)
-            return new Result<>(token, HttpStatus.CREATED);
+        {
+            Map<String, String> map = new HashMap<>();
+            map.put("token", token);
+            return new Result<>(map, HttpStatus.CREATED);
+        }
 
         return new Result<>(HttpStatus.UNAUTHORIZED);
     }
