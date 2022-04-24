@@ -2,6 +2,7 @@ package chunson.cc.carket.controller;
 
 import chunson.cc.carket.model.Result;
 import chunson.cc.carket.model.User;
+import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.service.UserService;
 import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
@@ -20,6 +21,9 @@ public class UserController
 {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AccountService accountService;
 
     @GetMapping("/user/{address}")
     public Result<?> getUser(@PathVariable String address)
@@ -51,6 +55,15 @@ public class UserController
         String address = TokenUtils.getAddress(token);
         if (address == null)
             return new Result(HttpStatus.UNAUTHORIZED);
+
+        if (req.containsKey("username"))
+        {
+            String username = req.get("username");
+            if (accountService.existsAccount(username))
+            {
+                return new Result<>(HttpStatus.FORBIDDEN);
+            }
+        }
 
         if (userService.updateUser(address, req))
             return new Result();

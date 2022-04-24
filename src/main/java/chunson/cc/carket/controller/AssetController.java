@@ -1,170 +1,126 @@
-//package chunson.cc.carket.controller;
-//
-//import chunson.cc.carket.mapper.AssetMapper;
-//import chunson.cc.carket.model.DisplayGoods;
-//import chunson.cc.carket.model.Goods;
-//import chunson.cc.carket.model.ReleaseGoods;
-//import chunson.cc.carket.model.Result;
-//import chunson.cc.carket.utils.COSUtils;
-//import chunson.cc.carket.utils.TokenUtils;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//
-//import javax.servlet.http.HttpServletRequest;
-//import java.io.IOException;
-//import java.util.List;
-//import java.util.Map;
-//
-//@RestController
-//@RequestMapping("/goods")
-//public class AssetController
-//{
-//    private AssetMapper assetMapper;
-//    private TokenUtils tokenUtils;
-//
-//    @Autowired
-//    public AssetController(AssetMapper assetMapper, TokenUtils tokenUtils)
+package chunson.cc.carket.controller;
+
+import chunson.cc.carket.model.Result;
+import chunson.cc.carket.model.Asset;
+import chunson.cc.carket.service.AccountService;
+import chunson.cc.carket.service.AssetService;
+import chunson.cc.carket.utils.FileUtils;
+import chunson.cc.carket.utils.TokenUtils;
+import com.sun.istack.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/")
+public class AssetController
+{
+    @Autowired
+    private AssetService assetService;
+
+    @Autowired
+    private AccountService accountService;
+
+    @PostMapping("/assets")
+    public Result<?> createAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @NotNull @RequestParam("file") MultipartFile file)
+    {
+        String userAddress = TokenUtils.getAddress(token);
+        if (null == userAddress)
+        {
+            return new Result(HttpStatus.UNAUTHORIZED);
+        }
+        String link = assetService.insertAsset(userAddress, req, file);
+        if (link != null)
+        {
+            Map<String, String> obj = new HashMap<>();
+            obj.put("link", link);
+            return new Result<>(obj, HttpStatus.CREATED);
+        }
+        return new Result(HttpStatus.FORBIDDEN);
+    }
+
+//    @GetMapping("/user/{userAddress}")
+//    public Result<?> getAsset(@PathVariable String userAddress)
 //    {
-//        this.assetMapper = assetMapper;
-//        this.tokenUtils = tokenUtils;
+//        Asset user = assetService.getAssetByAddress(userAddress);
+//        if (user != null)
+//            return new Result<>(user);
+//
+//        return new Result<>(HttpStatus.NOT_FOUND);
 //    }
 //
-//    @GetMapping("/getAll")
-//    public Result<List<Goods>> getAll()
+//    @GetMapping("/user")
+//    public Result<?> getMe(@CookieValue("token") String token)
 //    {
-//        List<Goods> list = assetMapper.getAllGoods();
-//        return Result.ok(list, null);
+//        String userAddress = TokenUtils.getAddress(token);
+//        if (userAddress != null)
+//        {
+//            Asset me = assetService.getAssetByAddress(userAddress);
+//            if (me != null)
+//                return new Result<>(me);
+//        }
+//
+//        return new Result<>(HttpStatus.UNAUTHORIZED);
 //    }
 //
-//    @GetMapping("/getById")
-//    public Result<Goods> getById(long goodsId)
+//    @PutMapping("/user")
+//    public Result<?> updateAsset(@RequestBody Map<String, String> req, @CookieValue("token") String token)
 //    {
-//        Goods goods = assetMapper.getGoodsById(goodsId);
-//        return Result.ok(goods, null);
+//        String userAddress = TokenUtils.getAddress(token);
+//        if (userAddress == null)
+//            return new Result(HttpStatus.UNAUTHORIZED);
+//
+//        if (req.containsKey("username"))
+//        {
+//            String username = req.get("username");
+//            if (accountService.existsAccount(username))
+//            {
+//                return new Result<>(HttpStatus.FORBIDDEN);
+//            }
+//        }
+//
+//        if (assetService.updateAsset(userAddress, req))
+//            return new Result();
+//        return new Result(HttpStatus.NOT_FOUND);
 //    }
 //
-//    @PostMapping("/updatePic")
-//    public Result updatePic(ReleaseGoods info, HttpServletRequest request) throws IOException
+//    @PutMapping("/user/{type}")
+//    public Result<?> updateAvatar(@NotNull @RequestParam("file") MultipartFile file, @CookieValue("token") String token, @NotNull @PathVariable String type)
 //    {
-//        String token = request.getHeader("token");
-//        Long userId = tokenUtils.getUserIdFromToken(token);
-//        if (null == userId)
+//        String userAddress = TokenUtils.getAddress(token);
+//        if (null == userAddress)
 //        {
-//            return Result.failure("用户未登录，非法操作，请重新登录");
+//            return new Result(HttpStatus.UNAUTHORIZED);
 //        }
-//        long goodsId = info.getGoodsId();
-//        Goods goods = assetMapper.getGoodsById(goodsId);
-//        if (goods.getSellerId() != userId)
+//        String key = type + "Link";
+//        AssetService.ImgType imgType;
+//        if (type.equals("avatar"))
 //        {
-//            return Result.failure("无权更改他人的商品");
+//            imgType = AssetService.ImgType.Avatar;
 //        }
-//
-//        String key = userId + "_" + System.currentTimeMillis() + ".jpg";
-//
-//        if (!COSUtils.uploadGoodsPic(info.getFile().getInputStream(), key))
+//        else if (type.equals("cover"))
 //        {
-//            return Result.failure("图片上传失败");
+//            imgType = AssetService.ImgType.Cover;
 //        }
-//        goods.setPicKey(key);
-//
-//        if (!assetMapper.updatePicKey(goods))
+//        else//路径既不是avatar也不是cover，错误路径
 //        {
-//            return Result.failure("修改图片失败");
+//            return new Result<>(HttpStatus.BAD_REQUEST);
 //        }
 //
-//        return Result.ok(goods, null);
+//        String link = assetService.updateImgResource(userAddress, file, imgType);
+//        if (link != null)
+//        {
+//            Map<String, String> map = new HashMap<>();
+//            map.put(key, link);
+//            return new Result<>(map);
+//        }
+//        else//不能更新，userAddress错误，未授权
+//        {
+//            return new Result<>(HttpStatus.UNAUTHORIZED);
+//        }
 //    }
-//
-//    @PostMapping("/updateInfo")
-//    public Result updateInfo(@RequestBody Map<String, String> req, HttpServletRequest request)
-//    {
-//        String token = request.getHeader("token");
-//        Long userId = tokenUtils.getUserIdFromToken(token);
-//        if (null == userId)
-//        {
-//            return Result.failure("用户未登录，非法操作，请重新登录");
-//        }
-//        long goodsId = Long.parseLong(req.get("goodsId"));
-//        Goods goods = assetMapper.getGoodsById(goodsId);
-//        if (goods.getSellerId() != userId)
-//        {
-//            return Result.failure("无权更改他人的商品");
-//        }
-//
-//        String desc = req.get("desc");
-//        String category = req.get("category");
-//        String priceText = req.get("price");
-//
-//        if (desc != null)
-//            goods.setGoodsDesc(desc);
-//        if (category != null)
-//            goods.setCategory(category);
-//        if (priceText != null)
-//        {
-//            double price = Double.parseDouble(priceText);
-//            goods.setPrice(price);
-//        }
-//
-//        if (!assetMapper.updateInfo(goods))
-//        {
-//            return Result.failure("修改商品失败");
-//        }
-//
-//        return Result.ok(goods, null);
-//    }
-//
-//    @GetMapping("/getAllDisplayGoods")
-//    public Result getAllDisplayGoods()
-//    {
-//        List<DisplayGoods> list = assetMapper.getAllDisplayGoods();
-//        return Result.ok(list, null);
-//    }
-//
-//    @PostMapping("/release")
-//    public Result release(ReleaseGoods info, HttpServletRequest request) throws IOException
-//    {
-//        String token = request.getHeader("token");
-//        Long userId = tokenUtils.getUserIdFromToken(token);
-//        if (null == userId)
-//        {
-//            return Result.failure("用户未登录，非法操作，请重新登录");
-//        }
-//
-//        String desc = info.getGoodsDesc();
-//        double price = info.getPrice();
-//        String category = info.getCategory();
-//        String key = userId + "_" + System.currentTimeMillis() + ".jpg";
-//
-//        Goods goods = new Goods();
-//        goods.setGoodsDesc(desc);
-//        goods.setPrice(price);
-//        goods.setPicKey(key);
-//        goods.setCategory(category);
-//        goods.setSellerId(userId);
-//
-//        if (!COSUtils.uploadGoodsPic(info.getFile().getInputStream(), key))
-//        {
-//            return Result.failure("图片上传失败");
-//        }
-//
-//        if (!assetMapper.insertGoods(goods))
-//        {
-//            return Result.failure("发布商品失败");
-//        }
-//
-//        goods = assetMapper.getDisplayGoodsById(goods.getGoodsId());
-//        return Result.ok(goods, null);
-//    }
-//
-//    @GetMapping("/getDisplayGoodsById")
-//    public Result getDisplayGoodsById(long goodsId)
-//    {
-//        DisplayGoods goods = assetMapper.getDisplayGoodsById(goodsId);
-//        if (goods == null)
-//        {
-//            return Result.failure("没有找到id为"+goodsId+"的商品");
-//        }
-//        return Result.ok(goods, null);
-//    }
-//
-//}
+}

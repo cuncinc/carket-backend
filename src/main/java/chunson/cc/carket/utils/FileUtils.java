@@ -16,10 +16,17 @@ public class FileUtils
     private static final String ASSETS_PRE = "assets/";
     private static final String COVER_PRE = "cover/";
     private static String resourcePath;
+    private static String walletPath;
 
-    public FileUtils(@Value("${file.resourcePath}") String resourcePath)
+    public FileUtils(@Value("${file.resourcePath}") String resourcePath, @Value("${file.walletPath}") String walletPath)
     {
         FileUtils.resourcePath = resourcePath;
+        FileUtils.walletPath = walletPath;
+    }
+
+    public static String getWalletPath()
+    {
+        return walletPath;
     }
 
     public static String storeAvatar(MultipartFile file)

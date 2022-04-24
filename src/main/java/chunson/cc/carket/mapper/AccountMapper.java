@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Mapper
 public interface AccountMapper
 {
-    @Insert("INSERT INTO Account(Address, UserName, PswHash, Salt) VALUES(#{address}, #{username}, #{pswHash}, #{salt});")
+    @Insert("INSERT INTO Account(Address, UserName, PswHash, Salt, WalletPsw, WalletName) VALUES(#{address}, #{username}, #{pswHash}, #{salt}, #{walletPsw}, #{walletName});")
     boolean insertAccount(Account account);
 
     @Select("SELECT ifnull((SELECT 1 FROM Account WHERE Username=#{username} LIMIT 1 ), 0) AS R;")

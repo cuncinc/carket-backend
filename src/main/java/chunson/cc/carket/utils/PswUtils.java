@@ -1,58 +1,28 @@
 package chunson.cc.carket.utils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Component;
 
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Random;
+
+@Component
 public class PswUtils
 {
-//    private final static String[] hexDigits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
-//
-//    public static String md5Password(String text)
-//    {
-////        System.out.println(text);
-//        text = salt(text);
-////        System.out.println(text);
-//        try
-//        {
-//            MessageDigest md = MessageDigest.getInstance("MD5");
-//            text = byte2hex(md.digest(text.getBytes()));
-//        }
-//        catch (NoSuchAlgorithmException e)
-//        {
-//            e.printStackTrace();
-//        }
-////        System.out.println(text);
-//
-//        return text;
-//    }
-//
-//    private static String salt(String text)
-//    {
-//        text = ".cmarket." + text + ".cmarket.";
-//        return text;
-//    }
-//
-//    private static String byte2hex(byte[] b)
-//    {
-//        StringBuilder resultSb = new StringBuilder();
-//        for (byte value : b)
-//        {
-//            resultSb.append(byte2String(value));
-//        }
-//        return resultSb.toString();
-//    }
-//
-//    private static String byte2String(byte b)
-//    {
-//        int n = b;
-//        if (n < 0)
-//            n = 256 + n;
-//        int d1 = n / 16;
-//        int d2 = n % 16;
-//        return hexDigits[d1] + hexDigits[d2];
-//    }
+    private static byte[] walletKey;
 
+    public PswUtils(@Value("${encrypt.walletKey}") String walletKey)
+    {
+        PswUtils.walletKey = walletKey.getBytes();
+    }
 
     public static String hashPassword(String plain_password)
     {
@@ -62,5 +32,28 @@ public class PswUtils
     public static boolean checkPassword(String password, String storedHash)
     {
         return BCrypt.checkpw(password, storedHash);
+    }
+
+//    public static String encryptWalletPsw(String plain) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
+//    {
+//        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+//        SecretKey key = new SecretKeySpec(walletKey, "AES");
+//        cipher.init(Cipher.ENCRYPT_MODE, key);
+//        byte[] encrypted = cipher.doFinal(plain.getBytes());
+//        return Base64.getEncoder().encodeToString(encrypted);
+//    }
+//
+//    public static String decryptWalletPsw(String encrypted) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
+//    {
+//        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+//        SecretKey key = new SecretKeySpec(walletKey, "AES");
+//        cipher.init(Cipher.DECRYPT_MODE, key);
+//        byte[] plain = cipher.doFinal(Base64.getDecoder().decode(encrypted));
+//        return new String(plain);
+//    }
+
+    public static String randomPassword()
+    {
+        return new SecureRandom().ints(new SecureRandom().nextInt(10) + 10, 33, 122).collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
     }
 }

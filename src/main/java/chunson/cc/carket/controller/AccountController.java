@@ -1,5 +1,6 @@
 package chunson.cc.carket.controller;
 
+import chunson.cc.carket.model.Account;
 import chunson.cc.carket.model.Result;
 import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.utils.TokenUtils;
@@ -7,7 +8,13 @@ import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.crypto.CipherException;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +33,7 @@ public class AccountController
         if (!service.existsAccount(username))
             return new Result();
 
-        return new Result<>(HttpStatus.NOT_FOUND);
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/account")
@@ -36,10 +43,28 @@ public class AccountController
         @NotNull String username = req.get("username");
         @NotNull String password = req.get("password");
 
-        if (service.logon(username, password))
-            return new Result(HttpStatus.CREATED);
+        if (username == null || password == null)
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
 
-        return new Result<>(HttpStatus.NOT_FOUND);
+        try
+        {
+            if (service.logon(username, password))
+            {
+                Account account = service.getAccountByUsername(username);
+                Map<String, String> map = new HashMap();
+                map.put("address", account.getAddress());
+                return new Result<>(map, HttpStatus.CREATED);
+            }
+        }
+        catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | CipherException | IOException e)
+        {
+            e.printStackTrace();
+            return new Result(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
     @DeleteMapping("/account")

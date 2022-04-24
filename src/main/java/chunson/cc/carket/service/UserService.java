@@ -30,7 +30,10 @@ public class UserService
     public boolean updateUser(String address, Map<String ,String> req)
     {
         User user = getUserByAddress(address);
-        if(req.containsKey("username")) user.setUsername(req.get("username"));
+        if(req.containsKey("username"))
+        {
+            user.setUsername(req.get("username"));
+        }
         if(req.containsKey("email")) user.setEmail(req.get("email"));
         if(req.containsKey("bio")) user.setBio(req.get("bio"));
         return mapper.updateUser(user);

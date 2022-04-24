@@ -46,7 +46,9 @@ public class User
 
     public String getAvatarLink()
     {
-        return ConfigUtils.getResourceUrlPre() + avatarRoute;
+        if (avatarRoute != null)
+            return ConfigUtils.getResourceUrlPre() + avatarRoute;
+        return null;
     }
 
     public String getAvatarRoute()
@@ -61,7 +63,9 @@ public class User
 
     public String getCoverLink()
     {
-        return ConfigUtils.getResourceUrlPre() + coverRoute;
+        if (coverRoute != null)
+            return ConfigUtils.getResourceUrlPre() + coverRoute;
+        return null;
     }
 
     public String getCoverRoute()

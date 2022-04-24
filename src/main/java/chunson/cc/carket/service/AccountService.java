@@ -2,11 +2,20 @@ package chunson.cc.carket.service;
 
 import chunson.cc.carket.mapper.AccountMapper;
 import chunson.cc.carket.model.Account;
+import chunson.cc.carket.utils.FileUtils;
 import chunson.cc.carket.utils.PswUtils;
 import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.WalletUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 
 @Service
@@ -29,10 +38,17 @@ public class AccountService
         return false;
     }
 
-    public boolean logon(String username, String password)
+    public boolean logon(String username, String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, CipherException, IOException
     {
+        if (existsAccount(username))
+            return false;
         String hash = PswUtils.hashPassword(password);
-        Account account = new Account(username, username, hash, password);
+        String walletPsw = PswUtils.randomPassword();
+        String name = WalletUtils.generateNewWalletFile(walletPsw, new File(FileUtils.getWalletPath()));
+
+        int origin = name.lastIndexOf('-') + 1;
+        String address = "0x" + name.substring(origin, origin + 40);
+        Account account = new Account(address, username, hash, password, walletPsw, name);
         return mapper.insertAccount(account);
     }
 
@@ -77,6 +93,11 @@ public class AccountService
         }
 
         return null;
+    }
+
+    public Account getAccountByUsername(String username)
+    {
+        return mapper.getAccountByName(username);
     }
 
     //只能查询自己的余额，并且需要登录
