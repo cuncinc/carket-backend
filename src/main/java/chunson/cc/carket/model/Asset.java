@@ -1,10 +1,14 @@
 package chunson.cc.carket.model;
 
 import chunson.cc.carket.utils.ConfigUtils;
+import chunson.cc.carket.utils.TimeUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Asset
 {
-    private String aId;
+    private int aid;
     private String name;
     private String type;
     private String address;
@@ -18,7 +22,9 @@ public class Asset
     private int clickCount;
     private String state;
 
-    public Asset() {}
+    public Asset()
+    {
+    }
 
     public Asset(String name, String type, String creator, String desc, String label)
     {
@@ -34,9 +40,9 @@ public class Asset
         this.name = name;
     }
 
-    public void setaId(String aId)
+    public void setAid(int aid)
     {
-        this.aId = aId;
+        this.aid = aid;
     }
 
     public void setType(String type)
@@ -99,9 +105,9 @@ public class Asset
         return name;
     }
 
-    public String getaId()
+    public int getAid()
     {
-        return aId;
+        return aid;
     }
 
     public String getType()
@@ -164,5 +170,20 @@ public class Asset
     public String getRoute()
     {
         return route;
+    }
+
+    public Map<String, String> auditing()
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("aid", aid + "");
+        map.put("name", name);
+        map.put("desc", desc);
+        map.put("creator", creator);
+        map.put("time", TimeUtils.humanTime(createTime));
+        map.put("link", getLink());
+        map.put("type", type);
+        map.put("lable", label);
+
+        return map;
     }
 }
