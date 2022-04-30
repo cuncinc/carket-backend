@@ -31,7 +31,7 @@ public class AuditController
         if (token != null)
         {
             Map<String, String> map = new HashMap<>();
-            map.put("token", token);
+            map.put("adminToken", token);
             return new Result<>(map, HttpStatus.CREATED);
         }
 
@@ -39,7 +39,7 @@ public class AuditController
     }
 
     @PutMapping("/session")
-    public Result<?> updateToken(@NotNull @CookieValue("token") String token)
+    public Result<?> updateToken(@NotNull @CookieValue("adminToken") String token)
     {
         if (token.equals(""))
             return new Result<>(HttpStatus.BAD_REQUEST);
@@ -55,7 +55,7 @@ public class AuditController
     }
 
     @GetMapping("/session")
-    public Result<?> checkToken(@NotNull @CookieValue("token") String token)
+    public Result<?> checkToken(@NotNull @CookieValue("adminToken") String token)
     {
         if (TokenUtils.isTokenOK(token))
             return new Result<>();
@@ -64,7 +64,7 @@ public class AuditController
     }
 
     @GetMapping("/todo")
-    public Result<?> getTodoAuditing(@NotNull @CookieValue("token") String token, @RequestParam Map<String, String> req)
+    public Result<?> getTodoAuditing(@NotNull @CookieValue("adminToken") String token, @RequestParam Map<String, String> req)
     {
         if (token.equals("") || !req.containsKey("page") || !req.containsKey("num"))
             return new Result<>(HttpStatus.BAD_REQUEST);
@@ -92,7 +92,7 @@ public class AuditController
     }
 
     @PostMapping("")
-    public Result<?> addAudit(@RequestBody List<AuditRecord> req, @NotNull @CookieValue("token") String token)
+    public Result<?> addAudit(@RequestBody List<AuditRecord> req, @NotNull @CookieValue("adminToken") String token)
     {
         if (token.equals(""))
             return new Result<>(HttpStatus.BAD_REQUEST);
@@ -114,7 +114,7 @@ public class AuditController
     }
 
     @GetMapping("/records")
-    public Result<?> getRecords(@NotNull @CookieValue("token") String token, @RequestParam Map<String, String> req)
+    public Result<?> getRecords(@NotNull @CookieValue("adminToken") String token, @RequestParam Map<String, String> req)
     {
         if (token.equals("") || !req.containsKey("page") || !req.containsKey("num"))
             return new Result<>(HttpStatus.BAD_REQUEST);

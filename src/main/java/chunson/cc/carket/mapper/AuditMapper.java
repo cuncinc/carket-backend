@@ -3,6 +3,7 @@ package chunson.cc.carket.mapper;
 import chunson.cc.carket.model.Admin;
 import chunson.cc.carket.model.AuditRecord;
 import chunson.cc.carket.model.Asset;
+import chunson.cc.carket.model.ShowAsset;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,8 @@ public interface AuditMapper
     @Update("UPDATE Admin SET PswHash = #{pswHash} WHERE AdminName = #{adminName}")
     boolean updatePswHash(String adminName, String pswHash);
 
-    @Select("SELECT * FROM Asset WHERE State = \"待审核\" LIMIT #{start}, #{num};")
-    List<Asset> selectAuditing(int start, int num);
+    @Select("SELECT Asset.*, `User`.AvatarRoute, `User`.Username AS CreatorName FROM `User`, Asset WHERE `User`.Address = Asset.Creator AND State = \"待审核\" LIMIT #{start}, #{num};")
+    List<ShowAsset> selectAuditing(int start, int num);
 
     @Select("SELECT * FROM AuditRecord WHERE AdminName = #{name} LIMIT #{start}, #{num};")
     List<AuditRecord> selectRecord(String name, int start, int num);
