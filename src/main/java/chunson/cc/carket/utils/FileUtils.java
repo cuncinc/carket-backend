@@ -13,7 +13,7 @@ import java.security.MessageDigest;
 public class FileUtils
 {
     private static final String AVATAR_PRE = "avatar/";
-    private static final String ASSETS_PRE = "assets/";
+//    private static final String ASSETS_PRE = "assets/";
     private static final String COVER_PRE = "cover/";
     private static String resourcePath;
     private static String walletPath;
@@ -39,14 +39,16 @@ public class FileUtils
         return storeFile(file, COVER_PRE);
     }
 
-    public static String storeAssets(MultipartFile file)
-    {
-        return storeFile(file, ASSETS_PRE);
-    }
+//    public static String storeAssets(MultipartFile file) throws IOException
+//    {
+////        return storeFile(file, ASSETS_PRE);
+//        return IpfsUtils.upload(file.getBytes());
+//    }
 
     private static String storeFile(MultipartFile file, String pre)
     {
         String name = file.getOriginalFilename();
+        assert name != null;
         String type = name.substring(name.lastIndexOf('.'));
         String md5 = getFileHash(file);
         String route = pre + md5 + type;

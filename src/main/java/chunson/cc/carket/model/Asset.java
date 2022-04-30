@@ -55,10 +55,10 @@ public class Asset
         this.address = address;
     }
 
-//    public void setCreateTime(String createTime)
-//    {
-//        this.createTime = createTime;
-//    }
+    public void setCreateTime(String createTime)
+    {
+        this.createTime = createTime;
+    }
 
     public void setCreator(String creator)
     {
@@ -90,10 +90,10 @@ public class Asset
         this.price = price;
     }
 
-//    public void setClickCount(int clickCount)
-//    {
-//        this.clickCount = clickCount;
-//    }
+    public void setClickCount(int clickCount)
+    {
+        this.clickCount = clickCount;
+    }
 
     public void setState(String state)
     {
@@ -158,7 +158,7 @@ public class Asset
     public String getLink()
     {
         if (route != null)
-            return ConfigUtils.getResourceUrlPre() + route;
+            return ConfigUtils.getIpfsPrefix() + route;
         return null;
     }
 
@@ -170,20 +170,5 @@ public class Asset
     public String getRoute()
     {
         return route;
-    }
-
-    public Map<String, String> auditing()
-    {
-        Map<String, String> map = new HashMap<>();
-        map.put("aid", aid + "");
-        map.put("name", name);
-        map.put("desc", desc);
-        map.put("creator", creator);
-        map.put("time", TimeUtils.humanTime(createTime));
-        map.put("link", getLink());
-        map.put("type", type);
-        map.put("lable", label);
-
-        return map;
     }
 }

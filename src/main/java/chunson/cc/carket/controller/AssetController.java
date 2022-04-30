@@ -1,10 +1,8 @@
 package chunson.cc.carket.controller;
 
 import chunson.cc.carket.model.Result;
-import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.service.AssetService;
-import chunson.cc.carket.utils.FileUtils;
 import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +32,17 @@ public class AssetController
         {
             return new Result(HttpStatus.UNAUTHORIZED);
         }
-        String link = assetService.insertAsset(userAddress, req, file);
+
+        String link;
+        try
+        {
+            link = assetService.insertAsset(userAddress, req, file);
+        }
+        catch (IOException e)
+        {
+            return new Result(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         if (link != null)
         {
             Map<String, String> obj = new HashMap<>();
