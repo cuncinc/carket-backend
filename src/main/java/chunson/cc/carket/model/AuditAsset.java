@@ -6,7 +6,7 @@ import chunson.cc.carket.utils.TimeUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShowAsset extends Asset
+public class AuditAsset extends Asset
 {
     private String creatorName;
     private String avatarRoute;

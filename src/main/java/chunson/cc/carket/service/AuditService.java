@@ -2,9 +2,8 @@ package chunson.cc.carket.service;
 
 import chunson.cc.carket.mapper.AuditMapper;
 import chunson.cc.carket.model.Admin;
-import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.model.AuditRecord;
-import chunson.cc.carket.model.ShowAsset;
+import chunson.cc.carket.model.AuditAsset;
 import chunson.cc.carket.utils.PswUtils;
 import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
@@ -53,9 +52,9 @@ public class AuditService
 
     public List<Map<String, String>> getAuditingAssets(@NotNull int page, int num)
     {
-        List<ShowAsset> assets = mapper.selectAuditing((page-1)*num, num);
+        List<AuditAsset> assets = mapper.selectAuditing((page-1)*num, num);
         List<Map<String, String>> maps = new ArrayList<>();
-        for (ShowAsset obj : assets)
+        for (AuditAsset obj : assets)
         {
             maps.add(obj.auditing());
         }
