@@ -8,14 +8,17 @@ import chunson.cc.carket.utils.TokenUtils;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.WalletUtils;
+import org.web3j.crypto.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 
 @Service
@@ -43,12 +46,17 @@ public class AccountService
         if (existsAccount(username))
             return false;
         String hash = PswUtils.hashPassword(password);
-        String walletPsw = PswUtils.randomPassword();
-        String name = WalletUtils.generateNewWalletFile(walletPsw, new File(FileUtils.getWalletPath()));
 
-        int origin = name.lastIndexOf('-') + 1;
-        String address = "0x" + name.substring(origin, origin + 40);
-        Account account = new Account(address, username, hash, password, walletPsw, name);
+//        String walletPsw = PswUtils.randomPassword();
+//        String name = WalletUtils.generateNewWalletFile(walletPsw, new File(FileUtils.getWalletPath()));
+//        int origin = name.lastIndexOf('-') + 1;
+//        String address = "0x" + name.substring(origin, origin + 40);
+
+        Map<String, String> map = newWallet();
+        String address = map.get("address");
+        String privateKey = map.get("privateKey");
+
+        Account account = new Account(address, username, hash, password, privateKey);
         return mapper.insertAccount(account);
     }
 
@@ -105,5 +113,29 @@ public class AccountService
     {
         @NotNull String address = TokenUtils.getAddress(token);
         return mapper.getBalance(address);
+    }
+
+    private static Map<String, String> newWallet()
+    {
+        String seed = UUID.randomUUID().toString();
+        Map<String, String> map = new HashMap<>();
+        try {
+            ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+            BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
+
+            String sPrivatekeyInHex = privateKeyInDec.toString(16);
+
+            WalletFile aWallet = Wallet.createLight(seed, ecKeyPair);
+            String sAddress = aWallet.getAddress();
+
+
+            map.put("address", "0x" + sAddress);
+            map.put("privateKey", sPrivatekeyInHex);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
     }
 }

@@ -7,19 +7,17 @@ public class Account
     private String pswHash;
     private String salt;
     private double balance;
-    private String walletPsw;
-    private String walletName;
+    private String privateKey;
 
     public Account(){}
 
-    public Account(String address, String username, String pswHash, String salt, String walletPsw, String walletName)
+    public Account(String address, String username, String pswHash, String salt, String privateKey)
     {
         this.address = address;
         this.username = username;
         this.pswHash = pswHash;
         this.salt = salt;
-        this.walletPsw = walletPsw;
-        this.walletName = walletName;
+        this.privateKey = privateKey;
     }
 
     public String getAddress()
@@ -72,23 +70,13 @@ public class Account
         this.balance = balance;
     }
 
-    public String getWalletPsw()
+    public String getPrivateKey()
     {
-        return walletPsw;
+        return privateKey;
     }
 
-    public void setWalletPsw(String walletPsw)
+    public void setPrivateKey(String privateKey)
     {
-        this.walletPsw = walletPsw;
-    }
-
-    public String getWalletName()
-    {
-        return walletName;
-    }
-
-    public void setWalletName(String walletName)
-    {
-        this.walletName = walletName;
+        this.privateKey = privateKey;
     }
 }

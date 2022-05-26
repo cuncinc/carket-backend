@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class IpfsUtils
@@ -41,5 +42,11 @@ public class IpfsUtils
         NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper(data);
         MerkleNode addResult = getInstance().add(file).get(0);
         return addResult.hash.toString();
+    }
+
+    public static String upload(String string) throws IOException
+    {
+        byte[] b = string.getBytes(StandardCharsets.UTF_8);
+        return upload(b);
     }
 }
