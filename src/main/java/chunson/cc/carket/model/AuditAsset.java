@@ -45,7 +45,7 @@ public class AuditAsset extends Asset
         map.put("desc", getDesc());
         map.put("creator", getCreator());
         map.put("time", TimeUtils.humanTime(getCreateTime()));
-        map.put("link", getLink());
+        map.put("link", getIpfsLink());
         map.put("type", getType());
         map.put("label", getLabel());
         map.put("creatorName", creatorName);

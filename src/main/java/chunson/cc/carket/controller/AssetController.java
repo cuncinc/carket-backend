@@ -1,9 +1,9 @@
 package chunson.cc.carket.controller;
 
 import chunson.cc.carket.model.Result;
-import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.service.AssetService;
 import chunson.cc.carket.utils.TokenUtils;
+import com.mysql.cj.util.StringUtils;
 import com.sun.istack.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +21,6 @@ public class AssetController
 {
     @Autowired
     private AssetService assetService;
-
-    @Autowired
-    private AccountService accountService;
-
 
     @PostMapping("/assets")
     public Result<?> createAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @NotNull @RequestParam("file") MultipartFile file)
@@ -54,8 +50,8 @@ public class AssetController
         return new Result(HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("/assets/{aid}/mint")
-    public Result<?> mintAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @PathVariable int aid)
+    @PostMapping("/assets/{aid}/blockchain")
+    public Result<?> mintAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
@@ -88,7 +84,7 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}/owner")
-    public Result<?> transfer(@CookieValue("token") String token, @PathVariable int aid, @RequestParam Map<String, String> req)
+    public Result<?> transfer(@CookieValue("token") String token, @PathVariable long aid, @RequestParam Map<String, String> req)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
@@ -106,18 +102,39 @@ public class AssetController
         return new Result(HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping("/myAssets")
-    public Result<?> getAssets(@CookieValue("token") String token)
+    @GetMapping("/assets/{whose}/{which}")
+    public Result<?> getAssets(@CookieValue("token") String token, @NotNull @PathVariable String whose, @NotNull @PathVariable String which)
     {
-        String me = TokenUtils.getAddress(token);
-        List<Map<String, String>> maps = assetService.myAssets(me);
-        return new Result<>(maps);
+        if (!(which.equals("created") || which.equals("on_sale") || which.equals("owned") || which.equals("auditing") || which.equals("favorite")))
+        {
+            return new Result(HttpStatus.BAD_REQUEST);
+        }
+
+        //自己看自己的视角
+        if (!StringUtils.isNullOrEmpty(token))
+        {
+            String meAddress = TokenUtils.getAddress(token);
+            if (whose.equals(meAddress) || whose.equals("my"))
+            {
+                return new Result<>(assetService.getAssetsOfUser(meAddress, which, true));
+            }
+        }
+
+        //访客视角没有“审核中”和“收藏”2个标签
+        if (which.equals("auditing") || which.equals("favorite"))
+        {
+            return new Result<>(HttpStatus.UNAUTHORIZED);
+        }
+        else
+        {
+            return new Result<>(assetService.getAssetsOfUser(whose, which, false));
+        }
     }
 
     @GetMapping("/assets")
     public Result<?> getAssets(@RequestParam Map<String, String> req)
     {
-        if ( !req.containsKey("page") || !req.containsKey("num"))
+        if (!req.containsKey("page") || !req.containsKey("num"))
             return new Result<>(HttpStatus.BAD_REQUEST);
 
         int page, num;
@@ -136,8 +153,8 @@ public class AssetController
         return new Result<>(maps);
     }
 
-    @PostMapping("/assets/{aid}")
-    public Result<?> upAssets(@CookieValue("token") String token, @PathVariable int aid)
+    @PostMapping("/assets/{aid}/market")
+    public Result<?> upAssets(@CookieValue("token") String token, @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
@@ -151,14 +168,46 @@ public class AssetController
         return new Result(HttpStatus.FORBIDDEN);
     }
 
-//    @PostMapping("/buy/{aid}")
-//    public Result<?> buy(@CookieValue("token") String token, @PathVariable int aid)
+//    @GetMapping("/assets/{id}")
+//    public Result<?> getOneAsset(@CookieValue("token") String token, @PathVariable long id, @RequestParam("type") String type)
 //    {
+//        System.out.println("11111111111");
+//        String me = TokenUtils.getAddress(token);
 //
+//        if (type.equals("aid"))
+//        {
+//            return new Result<>(assetService.getOneAssetByAid(id, me));
+//        }
+//        else if (type.equals("token_id"))
+//        {
+//            return new Result<>(assetService.getOneAssetByTokenId(id));
+//        }
+//        else
+//        {
+//            return new Result<>(HttpStatus.BAD_REQUEST);
+//        }
 //    }
 
-    @DeleteMapping("/assets/{aid}")
-    public Result<?> downAssets(@CookieValue("token") String token, @PathVariable int aid)
+    @GetMapping("/assets/{id}")
+    public Result<?> getOneAsset(@PathVariable long id, @RequestParam("type") String type)
+    {
+        System.out.println("22222222222222");
+        if (type.equals("aid"))
+        {
+            return new Result<>(assetService.getOneAssetByAid(id, null));
+        }
+        else if (type.equals("token_id"))
+        {
+            return new Result<>(assetService.getOneAssetByTokenId(id));
+        }
+        else
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/assets/{aid}/market")
+    public Result<?> downAssets(@CookieValue("token") String token, @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
@@ -173,96 +222,14 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}")
-    public Result<?> updateAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @PathVariable int aid)
+    public Result<?> updateAssets(@CookieValue("token") String token, @RequestParam("price") int price, @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null != userAddress)
         {
-            int price = Integer.parseInt(req.get("price"));
             if (assetService.updatePrice(userAddress, aid, price))
                 return new Result();
         }
         return new Result(HttpStatus.UNAUTHORIZED);
     }
-
-//    @GetMapping("/user/{userAddress}")
-//    public Result<?> getAsset(@PathVariable String userAddress)
-//    {
-//        Asset user = assetService.getAssetByAddress(userAddress);
-//        if (user != null)
-//            return new Result<>(user);
-//
-//        return new Result<>(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @GetMapping("/user")
-//    public Result<?> getMe(@CookieValue("token") String token)
-//    {
-//        String userAddress = TokenUtils.getAddress(token);
-//        if (userAddress != null)
-//        {
-//            Asset me = assetService.getAssetByAddress(userAddress);
-//            if (me != null)
-//                return new Result<>(me);
-//        }
-//
-//        return new Result<>(HttpStatus.UNAUTHORIZED);
-//    }
-//
-//    @PutMapping("/user")
-//    public Result<?> updateAsset(@RequestBody Map<String, String> req, @CookieValue("token") String token)
-//    {
-//        String userAddress = TokenUtils.getAddress(token);
-//        if (userAddress == null)
-//            return new Result(HttpStatus.UNAUTHORIZED);
-//
-//        if (req.containsKey("username"))
-//        {
-//            String username = req.get("username");
-//            if (accountService.existsAccount(username))
-//            {
-//                return new Result<>(HttpStatus.FORBIDDEN);
-//            }
-//        }
-//
-//        if (assetService.updateAsset(userAddress, req))
-//            return new Result();
-//        return new Result(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @PutMapping("/user/{type}")
-//    public Result<?> updateAvatar(@NotNull @RequestParam("file") MultipartFile file, @CookieValue("token") String token, @NotNull @PathVariable String type)
-//    {
-//        String userAddress = TokenUtils.getAddress(token);
-//        if (null == userAddress)
-//        {
-//            return new Result(HttpStatus.UNAUTHORIZED);
-//        }
-//        String key = type + "Link";
-//        AssetService.ImgType imgType;
-//        if (type.equals("avatar"))
-//        {
-//            imgType = AssetService.ImgType.Avatar;
-//        }
-//        else if (type.equals("cover"))
-//        {
-//            imgType = AssetService.ImgType.Cover;
-//        }
-//        else//路径既不是avatar也不是cover，错误路径
-//        {
-//            return new Result<>(HttpStatus.BAD_REQUEST);
-//        }
-//
-//        String link = assetService.updateImgResource(userAddress, file, imgType);
-//        if (link != null)
-//        {
-//            Map<String, String> map = new HashMap<>();
-//            map.put(key, link);
-//            return new Result<>(map);
-//        }
-//        else//不能更新，userAddress错误，未授权
-//        {
-//            return new Result<>(HttpStatus.UNAUTHORIZED);
-//        }
-//    }
 }

@@ -1,7 +1,6 @@
 package chunson.cc.carket.model;
 
 import chunson.cc.carket.utils.ConfigUtils;
-import chunson.cc.carket.utils.TimeUtils;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -9,21 +8,22 @@ import java.util.Map;
 
 public class Asset
 {
-    private int    aid;         //主键
-    private long   tokenId;     //在链上的tokenId
+    private Long aid;         //主键
+    private Long tokenId;     //在链上的tokenId
     private String name;        //title
     private String type;
     private String desc;
     private String createTime;
     private String owner;       //目前拥有者的地址
     private String creator;     //作者的地址
-    private int    rate;        //二级市场作者的收益率，0-10
+    private Integer rate;        //二级市场作者的收益率，0-10
     private String hash;        //文件哈希
     private String jsonCid;     //IPFS json文本的CID
-    private String route;       //文件的IPFS的CID
+    private String ipfsCid;       //文件的IPFS的CID
     private String label;       //标签
-    private int    price;       //价格，只能是整数，货币是VNT
-    private int    clickCount;  //点击数
+    private Integer price;       //价格，只能是整数，货币是VNT
+    private Integer clickCount;  //点击数
+    private Integer favoriteCount;  //点击数
     private String state;       //状态：1.待审核 2.未通过 3.已通过 4.在链上 5.在流通 6.已下架
 
     public Asset()
@@ -44,7 +44,7 @@ public class Asset
         Map<String, Object> map = new HashMap<>();
         map.put("name", getName());
         map.put("desc", getDesc());
-        map.put("cid", getRoute());
+        map.put("cid", getIpfsCid());
         map.put("creator", getCreator());
         map.put("rate", getRate());
 
@@ -58,7 +58,7 @@ public class Asset
         this.name = name;
     }
 
-    public void setAid(int aid)
+    public void setAid(Long aid)
     {
         this.aid = aid;
     }
@@ -88,9 +88,9 @@ public class Asset
         this.hash = hash;
     }
 
-    public void setRoute(String route)
+    public void setIpfsCid(String ipfsCid)
     {
-        this.route = route;
+        this.ipfsCid = ipfsCid;
     }
 
     public void setLabel(String label)
@@ -128,7 +128,7 @@ public class Asset
         this.rate = rate;
     }
 
-    public void setPrice(int price)
+    public void setPrice(Integer price)
     {
         this.price = price;
     }
@@ -138,7 +138,7 @@ public class Asset
         return name;
     }
 
-    public int getAid()
+    public Long getAid()
     {
         return aid;
     }
@@ -168,12 +168,12 @@ public class Asset
         return label;
     }
 
-    public double getPrice()
+    public Integer getPrice()
     {
         return price;
     }
 
-    public int getClickCount()
+    public Integer getClickCount()
     {
         return clickCount;
     }
@@ -183,11 +183,32 @@ public class Asset
         return state;
     }
 
-    public String getLink()
+    public String getIpfsLink()
     {
-        if (route != null)
-            return ConfigUtils.getIpfsPrefix() + route;
+        if (ipfsCid != null)
+            return ConfigUtils.getIpfsPrefix() + ipfsCid;
         return null;
+    }
+
+    public Integer getFavoriteCount()
+    {
+        return favoriteCount;
+    }
+
+    public void setFavoriteCount(int favoriteCount)
+    {
+        this.favoriteCount = favoriteCount;
+    }
+
+    public void addFavorite()
+    {
+        favoriteCount++;
+    }
+
+    public void subFavorite()
+    {
+        if (favoriteCount > 0)
+            favoriteCount--;
     }
 
     public String getHash()
@@ -195,17 +216,17 @@ public class Asset
         return hash;
     }
 
-    public String getRoute()
+    public String getIpfsCid()
     {
-        return route;
+        return ipfsCid;
     }
 
-    public long getTokenId()
+    public Long getTokenId()
     {
         return tokenId;
     }
 
-    public int getRate()
+    public Integer getRate()
     {
         return rate;
     }

@@ -8,8 +8,12 @@ import java.util.Map;
 
 public class ShowAsset extends Asset
 {
+//    private String ownerAddress;
     private String ownerName;
-    private String avatarRoute;
+    private String ownerAvatarRoute;
+//    private String creatorAddress;
+    private String creatorName;
+    private String creatorAvatarRoute;
 
     public String getOwnerName()
     {
@@ -21,20 +25,47 @@ public class ShowAsset extends Asset
         this.ownerName = ownerName;
     }
 
-    public String getAvatarRoute()
+    public String getCreatorName()
     {
-        return avatarRoute;
+        return creatorName;
     }
 
-    public void setAvatarRoute(String avatarRoute)
+    public String getCreatorAvatarRoute()
     {
-        this.avatarRoute = avatarRoute;
+        return creatorAvatarRoute;
     }
 
-    public String getAvatarLink()
+    public String getOwnerAvatarRoute()
     {
-        if (avatarRoute != null)
-            return ConfigUtils.getResourceUrlPre() + avatarRoute;
+        return ownerAvatarRoute;
+    }
+
+    public void setCreatorName(String creatorName)
+    {
+        this.creatorName = creatorName;
+    }
+
+    public void setCreatorAvatarRoute(String creatorAvatarRoute)
+    {
+        this.creatorAvatarRoute = creatorAvatarRoute;
+    }
+
+    public void setOwnerAvatarRoute(String ownerAvatarRoute)
+    {
+        this.ownerAvatarRoute = ownerAvatarRoute;
+    }
+
+    private String getOwnerAvatar()
+    {
+        if (ownerAvatarRoute != null)
+            return ConfigUtils.getResourceUrlPre() + ownerAvatarRoute;
+        return null;
+    }
+
+    private String getCreatorAvatar()
+    {
+        if (creatorAvatarRoute != null)
+            return ConfigUtils.getResourceUrlPre() + creatorAvatarRoute;
         return null;
     }
 
@@ -46,11 +77,14 @@ public class ShowAsset extends Asset
         map.put("desc", getDesc());
         map.put("owner", getOwner());
         map.put("time", TimeUtils.humanTime(getCreateTime()));
-        map.put("link", getLink());
+        map.put("link", getIpfsLink());
         map.put("type", getType());
         map.put("label", getLabel());
         map.put("ownerName", ownerName);
-        map.put("avatarLink", getAvatarLink());
+        map.put("creatorName", creatorName);
+        map.put("ownerAvatar", getOwnerAvatar());
+        map.put("creatorAvatar", getCreatorAvatar());
+        map.put("favoriteCount", getFavoriteCount()+"");
         map.put("state", getState());
         map.put("price", getPrice()+"");
         map.put("rate", getRate()+"");

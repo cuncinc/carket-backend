@@ -4,24 +4,24 @@ import chunson.cc.carket.utils.TimeUtils;
 
 public class AuditRecord
 {
-    private int auditId;
+    private Integer auditId;
     private String adminName;
-    private int aid;
+    private Long aid;
     private String checkTime;
     private String state;
     private String reason;
 
     public AuditRecord() {}
 
-    public AuditRecord(String adminName, int aId, String state, String reason)
+    public AuditRecord(String adminName, long aid, String state, String reason)
     {
         this.adminName = adminName;
-        this.aid = aId;
+        this.aid = aid;
         this.state = state;
         this.reason = reason;
     }
 
-    public int getAuditId()
+    public Integer getAuditId()
     {
         return auditId;
     }
@@ -36,12 +36,12 @@ public class AuditRecord
         this.adminName = adminName;
     }
 
-    public int getAid()
+    public Long getAid()
     {
         return aid;
     }
 
-    public void setAid(int aid)
+    public void setAid(long aid)
     {
         this.aid = aid;
     }

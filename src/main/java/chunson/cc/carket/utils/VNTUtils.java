@@ -17,7 +17,7 @@ public interface VNTUtils
 
     @FormUrlEncoded
     @POST("/mint")
-    int mint(@Field("to") String to, @Field("cid") String cid);
+    long mint(@Field("to") String to, @Field("cid") String cid);
 
     @FormUrlEncoded
     @POST("/transferToken")
