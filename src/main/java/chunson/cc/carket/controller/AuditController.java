@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/audit")
+@RequestMapping("/audits")
 public class AuditController
 {
     @Autowired

@@ -7,8 +7,6 @@ import chunson.cc.carket.utils.FileUtils;
 import chunson.cc.carket.utils.VNTUtils;
 import chunson.cc.carket.utils.IpfsUtils;
 import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,16 +18,19 @@ import java.util.Map;
 @Service
 public class AssetService
 {
-    @Autowired
-    private AssetMapper mapper;
+    private final AssetMapper mapper;
 
-    @Autowired
-    private VNTUtils vntUtils;
+    private final VNTUtils vntUtils;
+
+    public AssetService(AssetMapper mapper, VNTUtils vntUtils)
+    {
+        this.mapper = mapper;
+        this.vntUtils = vntUtils;
+    }
 
     public Asset getAssetByAid(Long aid)
     {
-        Asset asset = mapper.getAssetByAid(aid);
-        return asset;
+        return mapper.getAssetByAid(aid);
     }
 
     public List<Map<String, String>> getAssets(@NotNull int page, int num)
@@ -43,9 +44,8 @@ public class AssetService
         return maps;
     }
 
-    public Asset getOneAssetByAid(@NotNull Long aid, @Nullable String me)
+    public Asset getOneAssetByAid(@NotNull Long aid)
     {
-        //todo 确定权限，添加创作者、所有者信息
         Asset asset = mapper.selectOneAssetByAid(aid);
         if (null == asset) return null;
         return asset;
@@ -82,12 +82,16 @@ public class AssetService
             //todo
         }
 
-        List<Map<String, String>> maps = new ArrayList<>();
-        for (ShowAsset obj : assets)
+        if (assets != null)
         {
-            maps.add(obj.marketing());
+            List<Map<String, String>> maps = new ArrayList<>();
+            for (ShowAsset obj : assets)
+            {
+                maps.add(obj.marketing());
+            }
+            return maps;
         }
-        return maps;
+        return null;
     }
 
     public String uploadAsset(String userAddress, Map<String, String> req, MultipartFile file) throws IOException

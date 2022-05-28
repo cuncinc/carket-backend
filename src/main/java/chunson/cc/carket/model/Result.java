@@ -37,23 +37,4 @@ public class Result<T> extends ResponseEntity<T>
     {
         super(body, headers, rawStatus);
     }
-    //
-//    public static <T> Result<T> success(T data, int code, String message)
-//    {
-//        Result<T> result = new Result<>();
-//        result.setCode(code);
-//        result.setMessage(message);
-//        result.setData(data);
-//        return result;
-//    }
-//
-//    @Override
-//    public String toString()
-//    {
-//        return "Result{" +
-//                "code=" + code +
-//                ", message='" + message + '\'' +
-//                ", data=" + data +
-//                '}';
-//    }
 }

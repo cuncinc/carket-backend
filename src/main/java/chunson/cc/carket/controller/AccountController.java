@@ -25,7 +25,7 @@ public class AccountController
     @Autowired
     private AccountService service;
 
-    @GetMapping("/account")
+    @GetMapping("/accounts/exist")
 //    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="用户名已被占用")
     public Result<?> existsAccount(@RequestParam Map<String, String> req)
     {
@@ -36,7 +36,7 @@ public class AccountController
         return new Result<>(HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("/account")
+    @PostMapping("/accounts")
 //    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="用户名已被占用")
     public Result<?> logon(@RequestBody Map<String, String> req)
     {
@@ -67,7 +67,7 @@ public class AccountController
         return new Result<>(HttpStatus.FORBIDDEN);
     }
 
-    @DeleteMapping("/account")
+    @DeleteMapping("/accounts/me")
     public Result<?> deleteAccount(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
         if (token.equals(""))
@@ -86,7 +86,7 @@ public class AccountController
         return new Result<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PutMapping("/account")
+    @PutMapping("/accounts/me/password")
     public Result<?> updatePassword(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
         if (token.equals(""))

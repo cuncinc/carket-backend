@@ -190,6 +190,14 @@ public class Asset
         return null;
     }
 
+    public String getJsonLink()
+    {
+        if (jsonCid != null)
+            return ConfigUtils.getIpfsPrefix() + jsonCid;
+        return null;
+    }
+
+
     public Integer getFavoriteCount()
     {
         return favoriteCount;

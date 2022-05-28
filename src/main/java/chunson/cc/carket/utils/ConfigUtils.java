@@ -5,7 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource(value = {"config/test-config.properties"})
+//@PropertySource(value = {"config/test-config.properties"})
 public class ConfigUtils
 {
     private static String resourceUrlPre;

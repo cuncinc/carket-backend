@@ -5,7 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
-@PropertySource(value = {"config/db-config.properties"}, encoding = "UTF-8")
+//@PropertySource(value = {"config/db-config.properties"}, encoding = "UTF-8")
 public class MysqlConfig
 {
     private static String host;

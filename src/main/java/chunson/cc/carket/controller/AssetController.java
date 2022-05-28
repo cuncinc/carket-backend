@@ -1,11 +1,11 @@
 package chunson.cc.carket.controller;
 
+import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.model.Result;
 import chunson.cc.carket.service.AssetService;
 import chunson.cc.carket.utils.TokenUtils;
 import com.mysql.cj.util.StringUtils;
 import com.sun.istack.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +19,12 @@ import java.util.Map;
 @RequestMapping("/")
 public class AssetController
 {
-    @Autowired
-    private AssetService assetService;
+    private final AssetService assetService;
+
+    public AssetController(AssetService assetService)
+    {
+        this.assetService = assetService;
+    }
 
     @PostMapping("/assets")
     public Result<?> createAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @NotNull @RequestParam("file") MultipartFile file)
@@ -103,7 +107,7 @@ public class AssetController
     }
 
     @GetMapping("/assets/{whose}/{which}")
-    public Result<?> getAssets(@CookieValue("token") String token, @NotNull @PathVariable String whose, @NotNull @PathVariable String which)
+    public Result<?> getAssets(@CookieValue(value = "token", required = false) String token, @NotNull @PathVariable String whose, @NotNull @PathVariable String which)
     {
         if (!(which.equals("created") || which.equals("on_sale") || which.equals("owned") || which.equals("auditing") || which.equals("favorite")))
         {
@@ -168,41 +172,42 @@ public class AssetController
         return new Result(HttpStatus.FORBIDDEN);
     }
 
-//    @GetMapping("/assets/{id}")
-//    public Result<?> getOneAsset(@CookieValue("token") String token, @PathVariable long id, @RequestParam("type") String type)
-//    {
-//        System.out.println("11111111111");
-//        String me = TokenUtils.getAddress(token);
-//
-//        if (type.equals("aid"))
-//        {
-//            return new Result<>(assetService.getOneAssetByAid(id, me));
-//        }
-//        else if (type.equals("token_id"))
-//        {
-//            return new Result<>(assetService.getOneAssetByTokenId(id));
-//        }
-//        else
-//        {
-//            return new Result<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @GetMapping("/assets/{id}")
-    public Result<?> getOneAsset(@PathVariable long id, @RequestParam("type") String type)
+    public Result<?> getOneAsset(@CookieValue(value = "token", required = false) String token, @PathVariable long id, @RequestParam("type") String type)
     {
-        System.out.println("22222222222222");
+        String me = null;
+        if (token != null)
+            me = TokenUtils.getAddress(token);
+        Asset asset;
+
         if (type.equals("aid"))
         {
-            return new Result<>(assetService.getOneAssetByAid(id, null));
+            asset = assetService.getOneAssetByAid(id);
         }
         else if (type.equals("token_id"))
         {
-            return new Result<>(assetService.getOneAssetByTokenId(id));
+            asset = assetService.getOneAssetByTokenId(id);
         }
         else
         {
             return new Result<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (asset != null)
+        {
+            if (asset.getTokenId() == null)
+            {
+                if (me == null || !me.equals(asset.getCreator()))
+                {
+                    return new Result<>(HttpStatus.UNAUTHORIZED);
+                }
+            }
+
+            return new Result<>(asset);
+        }
+        else
+        {
+            return new Result<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -222,7 +227,8 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}")
-    public Result<?> updateAssets(@CookieValue("token") String token, @RequestParam("price") int price, @PathVariable long aid)
+    public Result<?> updateAssets(@CookieValue("token") String token, @RequestParam("price") int price,
+                                  @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null != userAddress)

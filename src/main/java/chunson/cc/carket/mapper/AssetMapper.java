@@ -23,7 +23,7 @@ public interface AssetMapper
     @Select("SELECT * FROM `Asset` WHERE AId = #{aid};")
     Asset getAssetByAid(Long aid);
 
-    @Insert("INSERT INTO Asset ( `Name`, Type, `Desc`, Creator, Route, `Hash`, Label ) VALUES ( #{name}, #{type}, #{desc}, #{creator}, #{route}, #{hash}, #{label} );")
+    @Insert("INSERT INTO Asset ( `Name`, Type, `Desc`, Creator, IpfsCid, `Hash`, Label ) VALUES ( #{name}, #{type}, #{desc}, #{creator}, #{ipfsCid}, #{hash}, #{label} );")
     boolean insertAsset (Asset asset);
 
     @Update("UPDATE Asset SET TokenId=#{tokenId},JsonCId=#{jsonCid},`Owner`=#{owner},Rate=#{rate},State=\"在链上\" WHERE AId=#{aid};")

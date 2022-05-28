@@ -78,6 +78,7 @@ public class ShowAsset extends Asset
         map.put("owner", getOwner());
         map.put("time", TimeUtils.humanTime(getCreateTime()));
         map.put("link", getIpfsLink());
+        map.put("jsonLink", getJsonLink());
         map.put("type", getType());
         map.put("label", getLabel());
         map.put("ownerName", ownerName);

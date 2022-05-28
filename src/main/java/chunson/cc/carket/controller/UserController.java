@@ -25,7 +25,7 @@ public class UserController
     @Autowired
     private AccountService accountService;
 
-    @GetMapping("/user/{address}")
+    @GetMapping("/users/{address}")
     public Result<?> getUser(@PathVariable String address)
     {
         User user = userService.getUserByAddress(address);
@@ -35,7 +35,7 @@ public class UserController
         return new Result<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/users/me")
     public Result<?> getMe(@CookieValue("token") String token)
     {
         String address = TokenUtils.getAddress(token);
@@ -49,7 +49,7 @@ public class UserController
         return new Result<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PutMapping("/user")
+    @PutMapping("/users/me")
     public Result<?> updateUser(@RequestBody Map<String, String> req, @CookieValue("token") String token)
     {
         String address = TokenUtils.getAddress(token);
@@ -70,7 +70,7 @@ public class UserController
         return new Result(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/user/{type}")
+    @PutMapping("/users/me/{type}")
     public Result<?> updateAvatar(@NotNull @RequestParam("file") MultipartFile file, @CookieValue("token") String token, @NotNull @PathVariable String type)
     {
         String address = TokenUtils.getAddress(token);
