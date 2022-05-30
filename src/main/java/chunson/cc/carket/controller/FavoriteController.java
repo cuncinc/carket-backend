@@ -62,10 +62,10 @@ public class FavoriteController
     @GetMapping("/{aid}/{address}")
     public Result<?> isMeFavorite(@PathVariable long aid, @PathVariable String address)
     {
-
         Map<String, Object> map = new HashMap<>();
         map.put("aid", aid);
         map.put("address", address);
+        map.put("count", service.getFavoriteCount(aid));
 
         if (service.getFavorite(address, aid))
         {
