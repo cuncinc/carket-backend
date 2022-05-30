@@ -11,7 +11,7 @@ public class Event
     private Integer amount;
     private String type;
     private String txHash;
-    private Date timestamp;
+    private String timestamp;
 
     public Event(String from, String to, Long tokenId, Integer amount, String type, String txHash)
     {
@@ -93,12 +93,12 @@ public class Event
         this.txHash = txHash;
     }
 
-    public Date getTimestamp()
+    public String getTimestamp()
     {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp)
+    public void setTimestamp(String timestamp)
     {
         this.timestamp = timestamp;
     }

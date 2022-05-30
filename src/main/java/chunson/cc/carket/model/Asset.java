@@ -24,7 +24,7 @@ public class Asset
     private Integer price;       //价格，只能是整数，货币是VNT
     private Integer clickCount;  //点击数
     private Integer favoriteCount;  //点击数
-    private String state;       //状态：1.待审核 2.未通过 3.已通过 4.在链上 5.在流通 6.已下架
+    private String state;       //状态：1.待审核 2.未通过 3.已通过 4.未流通 5.在流通
 
     public Asset()
     {

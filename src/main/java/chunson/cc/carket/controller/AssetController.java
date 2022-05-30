@@ -55,7 +55,7 @@ public class AssetController
     }
 
     @PostMapping("/assets/{aid}/blockchain")
-    public Result<?> mintAssets(@CookieValue("token") String token, @RequestParam Map<String, String> req, @PathVariable long aid)
+    public Result<?> mintAssets(@CookieValue("token") String token, @RequestBody Map<String, String> req, @PathVariable long aid)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
@@ -66,8 +66,7 @@ public class AssetController
         try
         {
             int rate = Integer.parseInt(req.get("rate"));
-            int price = Integer.parseInt(req.get("price"));
-            if (assetService.mintAsset(userAddress, aid, price, rate))
+            if (assetService.mintAsset(userAddress, aid, rate))
             {
                 return new Result(HttpStatus.CREATED);
             }
@@ -88,22 +87,27 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}/owner")
-    public Result<?> transfer(@CookieValue("token") String token, @PathVariable long aid, @RequestParam Map<String, String> req)
+    public Result<?> transfer(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, String> req)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
-            return new Result(HttpStatus.UNAUTHORIZED);
+            return new Result<>(HttpStatus.UNAUTHORIZED);
         }
 
         String to = req.get("to");
 
-        if (assetService.transfer(userAddress, to, aid))
+        if (userAddress.equals(to))
         {
-            return new Result();
+            return new Result<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new Result(HttpStatus.FORBIDDEN);
+        if (assetService.transfer(userAddress, to, aid))
+        {
+            return new Result<>();
+        }
+
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/assets/{whose}/{which}")
@@ -158,15 +162,15 @@ public class AssetController
     }
 
     @PostMapping("/assets/{aid}/market")
-    public Result<?> upAssets(@CookieValue("token") String token, @PathVariable long aid)
+    public Result<?> upAsset(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, String> req)
     {
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
             return new Result(HttpStatus.UNAUTHORIZED);
         }
-
-        if (assetService.upAsset(userAddress, aid))
+        int price = Integer.parseInt(req.get("price"));
+        if (assetService.upAsset(userAddress, aid, price))
             return new Result<>(HttpStatus.CREATED);
 
         return new Result(HttpStatus.FORBIDDEN);
