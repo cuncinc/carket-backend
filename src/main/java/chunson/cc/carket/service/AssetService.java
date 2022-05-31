@@ -3,10 +3,13 @@ package chunson.cc.carket.service;
 import chunson.cc.carket.mapper.AssetMapper;
 import chunson.cc.carket.mapper.EventMapper;
 import chunson.cc.carket.model.Asset;
+import chunson.cc.carket.model.Event;
 import chunson.cc.carket.model.ShowAsset;
+import chunson.cc.carket.model.TxResult;
 import chunson.cc.carket.utils.FileUtils;
 import chunson.cc.carket.utils.VNTUtils;
 import chunson.cc.carket.utils.IpfsUtils;
+import com.google.gson.Gson;
 import com.sun.istack.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -157,13 +160,23 @@ public class AssetService
         }
     }
 
-    public boolean updatePrice(String address, Long aid, int price)
+    public boolean updatePrice(String address, Long aid, int amount, boolean isUp)
     {
+//        System.out.println("amount: " + amount);
         if (!checkOwner(address, aid)) return false;
         Asset asset = assetMapper.getAssetByAid(aid);
         long tokenId = asset.getTokenId();
-//        vntUtils.setPrice(address, tokenId, price);  //todo
-        return assetMapper.updatePrice(aid, price);
+        String json = vntUtils.setPrice(address, tokenId, amount);
+        TxResult result = new Gson().fromJson(json, TxResult.class);
+        amount = result.getAmount();
+//        System.out.println("newPrice: " + amount);
+        if (!isUp)
+        {
+            String txHash = result.getTxHash();
+            Event event = new Event("更新价格", address, null, tokenId, amount, txHash);
+            eventMapper.insertEventWithTxHash(event);
+        }
+        return assetMapper.updatePrice(aid, amount);
     }
 
     public boolean upAsset(String address, Long aid, int price)
@@ -172,7 +185,7 @@ public class AssetService
         {
             //todo 添加价格，包括区块链和数据库
             //todo 添加一个上架Event
-            updatePrice(address, aid, price);
+            updatePrice(address, aid, price, true);
             Asset asset = assetMapper.getAssetByAid(aid);
             eventMapper.insertEvent("上架", address, null, asset.getTokenId(), price);
             return assetMapper.updateState(aid, "在流通");
@@ -192,7 +205,7 @@ public class AssetService
         return false;
     }
 
-    public void updateAsset(Long aid)
+    public void updateAsset(Long aid, String name, String desc)
     {
 
     }

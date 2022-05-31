@@ -13,7 +13,9 @@ public class Event
     private String txHash;
     private String timestamp;
 
-    public Event(String from, String to, Long tokenId, Integer amount, String type, String txHash)
+    public static final String NullAddress = "0x0000000000000000000000000000000000000000";
+
+    public Event(String type, String from, String to, Long tokenId, Integer amount, String txHash)
     {
         this.from = from;
         this.to = to;

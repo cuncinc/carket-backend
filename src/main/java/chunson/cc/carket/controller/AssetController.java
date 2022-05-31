@@ -32,7 +32,7 @@ public class AssetController
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
-            return new Result(HttpStatus.UNAUTHORIZED);
+            return new Result<>(HttpStatus.UNAUTHORIZED);
         }
 
         String link;
@@ -42,7 +42,7 @@ public class AssetController
         }
         catch (IOException e)
         {
-            return new Result(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new Result<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (link != null)
@@ -51,7 +51,7 @@ public class AssetController
             obj.put("link", link);
             return new Result<>(obj, HttpStatus.CREATED);
         }
-        return new Result(HttpStatus.FORBIDDEN);
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
     @PostMapping("/assets/{aid}/blockchain")
@@ -60,7 +60,7 @@ public class AssetController
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
-            return new Result(HttpStatus.UNAUTHORIZED);
+            return new Result<>(HttpStatus.UNAUTHORIZED);
         }
 
         try
@@ -68,7 +68,7 @@ public class AssetController
             int rate = Integer.parseInt(req.get("rate"));
             if (assetService.mintAsset(userAddress, aid, rate))
             {
-                return new Result(HttpStatus.CREATED);
+                return new Result<>(HttpStatus.CREATED);
             }
             else
             {
@@ -115,7 +115,7 @@ public class AssetController
     {
         if (!(which.equals("created") || which.equals("on_sale") || which.equals("owned") || which.equals("auditing") || which.equals("favorite")))
         {
-            return new Result(HttpStatus.BAD_REQUEST);
+            return new Result<>(HttpStatus.BAD_REQUEST);
         }
 
         //自己看自己的视角
@@ -167,13 +167,13 @@ public class AssetController
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
-            return new Result(HttpStatus.UNAUTHORIZED);
+            return new Result<>(HttpStatus.UNAUTHORIZED);
         }
         int price = Integer.parseInt(req.get("price"));
         if (assetService.upAsset(userAddress, aid, price))
             return new Result<>(HttpStatus.CREATED);
 
-        return new Result(HttpStatus.FORBIDDEN);
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/assets/{id}")
@@ -221,25 +221,48 @@ public class AssetController
         String userAddress = TokenUtils.getAddress(token);
         if (null == userAddress)
         {
-            return new Result(HttpStatus.UNAUTHORIZED);
+            return new Result<>(HttpStatus.UNAUTHORIZED);
         }
 
         if (assetService.downAsset(userAddress, aid))
             return new Result<>();
 
-        return new Result(HttpStatus.FORBIDDEN);
+        return new Result<>(HttpStatus.FORBIDDEN);
     }
 
-    @PutMapping("/assets/{aid}")
-    public Result<?> updateAssets(@CookieValue("token") String token, @RequestParam("price") int price,
-                                  @PathVariable long aid)
+    @PutMapping("/assets/{aid}")//修改未上链的艺术品的信息
+    public Result<?> updateAssets(@CookieValue("token") String token, @RequestBody Map<String, String> req, @PathVariable long aid)
     {
+        String name = req.get("name");
+        String desc = req.get("desc");
+        if (StringUtils.isNullOrEmpty(name) || desc == null)
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
+
+        String address = TokenUtils.getAddress(token);
+        if (null != address)
+        {
+            //todo
+        }
+        return new Result<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @PutMapping("/assets/{aid}/price")//修改未上链后的艺术品的价格
+    public Result<?> setPrice(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, Object> req)
+    {
+        Integer price = (Integer) req.get("price");
+        if (price == null)
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
+
         String userAddress = TokenUtils.getAddress(token);
         if (null != userAddress)
         {
-            if (assetService.updatePrice(userAddress, aid, price))
-                return new Result();
+            if (assetService.updatePrice(userAddress, aid, price, false))
+                return new Result<>();
         }
-        return new Result(HttpStatus.UNAUTHORIZED);
+        return new Result<>(HttpStatus.UNAUTHORIZED);
     }
 }
