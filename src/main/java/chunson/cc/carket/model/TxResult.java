@@ -3,16 +3,16 @@ package chunson.cc.carket.model;
 public class TxResult
 {
     private String txHash;
-    private Integer amount;
-
-    public TxResult(String txHash, Integer amount)
-    {
-        this.txHash = txHash;
-        this.amount = amount;
-    }
+    private Object data;
 
     public TxResult()
     {
+    }
+
+    public TxResult(String txHash, Object data)
+    {
+        this.txHash = txHash;
+        this.data = data;
     }
 
     public String getTxHash()
@@ -25,13 +25,13 @@ public class TxResult
         this.txHash = txHash;
     }
 
-    public Integer getAmount()
+    public Object getData()
     {
-        return amount;
+        return data;
     }
 
-    public void setAmount(Integer amount)
+    public void setData(Object data)
     {
-        this.amount = amount;
+        this.data = data;
     }
 }

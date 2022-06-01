@@ -125,11 +125,18 @@ public class AssetService
         asset.setRate(rate);
         asset.setOwner(asset.getCreator());
 
-        String json = asset.toIpfsJson();
-        String jsonCid = IpfsUtils.upload(json);
+        String tokenJson = asset.toIpfsJson();
+        String jsonCid = IpfsUtils.upload(tokenJson);
 //        System.out.println(jsonCid);
-        long tokenId = vntUtils.mint(asset.getCreator(), jsonCid);
-
+        String json = vntUtils.mint(asset.getCreator(), jsonCid);
+//        System.out.println(json);
+        TxResult txResult = new Gson().fromJson(json, TxResult.class);
+        long tokenId = Long.parseLong((String) txResult.getData());
+        String txHash = txResult.getTxHash();
+        System.out.println(txHash);
+        System.out.println(tokenId);
+        Event event = new Event("铸造", Event.NullAddress, address, tokenId, null, txHash);
+        eventMapper.insertEventWithTxHash(event);
         asset.setState("已上链");
         asset.setJsonCid(jsonCid);
         asset.setTokenId(tokenId);
@@ -146,12 +153,18 @@ public class AssetService
         Asset asset = assetMapper.getAssetByAid(aid);
         long tokenId = asset.getTokenId();
 //        System.out.println(tokenId);
-        String newOwner = vntUtils.transferToken(from, to, tokenId);
+        String json = vntUtils.transferToken(from, to, tokenId);
+        TxResult txResult = new Gson().fromJson(json, TxResult.class);
+        String newOwner = (String) txResult.getData();
+        String txHash = txResult.getTxHash();
+
 //        System.out.println(newOwner);
         if (newOwner.equals(to))
         {
 //            System.out.println("11111");
             //todo 加入Event事件，transfer，同时，vnt中间件返回txHash
+            Event event = new Event("转让Token", from, to, tokenId, null, txHash);
+            eventMapper.insertEventWithTxHash(event);
             return assetMapper.updateOwner(aid, newOwner);
         }
         else
@@ -168,7 +181,7 @@ public class AssetService
         long tokenId = asset.getTokenId();
         String json = vntUtils.setPrice(address, tokenId, amount);
         TxResult result = new Gson().fromJson(json, TxResult.class);
-        amount = result.getAmount();
+        amount = (int) result.getData();
 //        System.out.println("newPrice: " + amount);
         if (!isUp)
         {

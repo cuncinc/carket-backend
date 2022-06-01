@@ -6,7 +6,7 @@ import retrofit2.http.*;
 @RetrofitClient(baseUrl = "${vnt.url}")
 public interface VNTUtils
 {
-//////////// 业务逻辑
+    //////////// 业务逻辑
     @FormUrlEncoded
     @POST("/charge")
     String charge(@Field("to") String to, @Field("amount") long amount);
@@ -17,11 +17,11 @@ public interface VNTUtils
 
     @FormUrlEncoded
     @POST("/mint")
-    long mint(@Field("to") String to, @Field("cid") String cid);
+    String mint(@Field("to") String to, @Field("cid") String cid);
 
     @FormUrlEncoded
     @POST("/transferToken")
-    String transferToken(@Field("from") String from, @Field("to") String to,  @Field("tokenId") long tokenId);
+    String transferToken(@Field("from") String from, @Field("to") String to, @Field("tokenId") long tokenId);
 
     @FormUrlEncoded
     @POST("/transferVNT")
@@ -43,7 +43,7 @@ public interface VNTUtils
     String getBalance(@Query("address") String address);
 
 
-//////////// 下面是溯源相关
+    //////////// 下面是溯源相关
     @GET("/blockNumber")
     long getBlockNumber();
 
