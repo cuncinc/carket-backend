@@ -1,5 +1,7 @@
 package chunson.cc.carket.controller;
 
+import chunson.cc.carket.Exception.CreatorNotCorrespondException;
+import chunson.cc.carket.Exception.StateNotCorrespondException;
 import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.model.Result;
 import chunson.cc.carket.service.AssetService;
@@ -231,11 +233,12 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}")//修改未上链的艺术品的信息
-    public Result<?> updateAssets(@CookieValue("token") String token, @RequestBody Map<String, String> req, @PathVariable long aid)
+    public Result<?> updateAssets(@CookieValue("token") String token, @RequestBody Map<String, String> body, @PathVariable long aid)
     {
-        String name = req.get("name");
-        String desc = req.get("desc");
-        if (StringUtils.isNullOrEmpty(name) || desc == null)
+        String name = body.get("name");
+        String desc = body.get("desc");
+        Map<String, String> map = new HashMap<>();
+        if (name == null && desc == null)
         {
             return new Result<>(HttpStatus.BAD_REQUEST);
         }
@@ -243,9 +246,29 @@ public class AssetController
         String address = TokenUtils.getAddress(token);
         if (null != address)
         {
-            //todo
+            try
+            {
+                assetService.updateAsset(address, aid, name, desc);
+                return new Result<>();
+            }
+            catch (CreatorNotCorrespondException e)
+            {
+                e.printStackTrace();
+                map.put("message", "creator of token is not you");
+                return new Result<>(map, HttpStatus.UNAUTHORIZED);
+            }
+            catch (StateNotCorrespondException e)
+            {
+                e.printStackTrace();
+                map.put("message", "token is on chain, can not be changed");
+                return new Result<>(map, HttpStatus.FORBIDDEN);
+            }
         }
-        return new Result<>(HttpStatus.UNAUTHORIZED);
+        else
+        {
+            map.put("message", "token error!");
+            return new Result<>(map, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PutMapping("/assets/{aid}/price")//修改未上链后的艺术品的价格

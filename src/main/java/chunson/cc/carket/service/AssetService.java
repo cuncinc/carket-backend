@@ -1,11 +1,12 @@
 package chunson.cc.carket.service;
 
+import chunson.cc.carket.Exception.CreatorNotCorrespondException;
+import chunson.cc.carket.Exception.StateNotCorrespondException;
 import chunson.cc.carket.mapper.AssetMapper;
 import chunson.cc.carket.mapper.EventMapper;
-import chunson.cc.carket.model.Asset;
-import chunson.cc.carket.model.Event;
-import chunson.cc.carket.model.ShowAsset;
-import chunson.cc.carket.model.TxResult;
+import chunson.cc.carket.mapper.FavoriteMapper;
+import chunson.cc.carket.mapper.UserMapper;
+import chunson.cc.carket.model.*;
 import chunson.cc.carket.utils.FileUtils;
 import chunson.cc.carket.utils.VNTUtils;
 import chunson.cc.carket.utils.IpfsUtils;
@@ -24,12 +25,14 @@ public class AssetService
 {
     private final AssetMapper assetMapper;
     private final EventMapper eventMapper;
+    private final UserMapper userMapper;
     private final VNTUtils vntUtils;
 
-    public AssetService(AssetMapper assetMapper, EventMapper eventMapper, VNTUtils vntUtils)
+    public AssetService(AssetMapper assetMapper, EventMapper eventMapper, UserMapper userMapper, VNTUtils vntUtils)
     {
         this.assetMapper = assetMapper;
         this.eventMapper = eventMapper;
+        this.userMapper = userMapper;
         this.vntUtils = vntUtils;
     }
 
@@ -84,11 +87,29 @@ public class AssetService
         }
         else if (isMe && which.equals("favorite"))
         {
-            //todo
+            assets = assetMapper.selectFavoriteAssets(whose);
         }
 
         if (assets != null)
         {
+            //太费时间
+            for (ShowAsset asset : assets)
+            {
+                if (asset.getCreator() != null)
+                {
+                    User creator = userMapper.getUserByAddress(asset.getCreator());
+                    asset.setCreatorName(creator.getUsername());
+                    asset.setCreatorAvatarRoute(creator.getAvatarRoute());
+                }
+
+                if (asset.getOwner() != null)
+                {
+                    User owner = userMapper.getUserByAddress(asset.getOwner());
+                    asset.setOwnerName(owner.getUsername());
+                    asset.setOwnerAvatarRoute(owner.getAvatarRoute());
+                }
+            }
+
             List<Map<String, String>> maps = new ArrayList<>();
             for (ShowAsset obj : assets)
             {
@@ -180,8 +201,9 @@ public class AssetService
         Asset asset = assetMapper.getAssetByAid(aid);
         long tokenId = asset.getTokenId();
         String json = vntUtils.setPrice(address, tokenId, amount);
+//        System.out.println(json);
         TxResult result = new Gson().fromJson(json, TxResult.class);
-        amount = (int) result.getData();
+        amount = Integer.parseInt((String) result.getData());
 //        System.out.println("newPrice: " + amount);
         if (!isUp)
         {
@@ -218,9 +240,19 @@ public class AssetService
         return false;
     }
 
-    public void updateAsset(Long aid, String name, String desc)
+    public void updateAsset(String address, Long aid, String name, String desc) throws CreatorNotCorrespondException, StateNotCorrespondException
     {
-
+        Asset asset = assetMapper.getAssetByAid(aid);
+        if (!address.equals(asset.getCreator()))
+        {
+            throw new CreatorNotCorrespondException();
+        }
+        if (asset.getTokenId() != null)
+        {
+            throw new StateNotCorrespondException();
+        }
+        if (name != null) assetMapper.updateName(aid, name);
+        if (desc != null) assetMapper.updateDesc(aid, desc);
     }
 
     private boolean checkOwner(String address, Long aid)
