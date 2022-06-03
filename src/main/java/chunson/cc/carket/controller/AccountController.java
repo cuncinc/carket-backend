@@ -22,8 +22,12 @@ import java.util.Map;
 @RequestMapping("/")
 public class AccountController
 {
-    @Autowired
-    private AccountService service;
+    private final AccountService service;
+
+    public AccountController(AccountService service)
+    {
+        this.service = service;
+    }
 
     @GetMapping("/accounts/exist")
 //    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="用户名已被占用")
@@ -58,7 +62,8 @@ public class AccountController
                 return new Result<>(map, HttpStatus.CREATED);
             }
         }
-        catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException | CipherException | IOException e)
+        catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException |
+               CipherException | IOException e)
         {
             e.printStackTrace();
             return new Result(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -99,7 +104,7 @@ public class AccountController
             @NotNull String newPassword = req.get("new_psw");
             if (service.updatePassword(address, oldPassword, newPassword))
             {
-               return new Result();
+                return new Result();
             }
         }
 
@@ -154,5 +159,43 @@ public class AccountController
             return new Result<>();
 
         return new Result(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/accounts/me/balance")
+    public Result<?> getBalance(@NotNull @CookieValue("token") String token)
+    {
+        String me = TokenUtils.getAddress(token);
+        if (me == null)
+        {
+            return new Result<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Double balance = service.getBalance(me);
+        Map<String, Object> result = new HashMap<>();
+        result.put("address", me);
+        result.put("balance", balance);
+        return new Result<>(result);
+    }
+
+    @PutMapping("/accounts/me/balance")
+    public Result<?> charge(@NotNull @CookieValue("token") String token, @RequestBody Map<String, Integer> map)
+    {
+        Integer amount = map.get("amount");
+        if (amount == null)
+        {
+            return new Result<>(HttpStatus.BAD_REQUEST);
+        }
+
+        String me = TokenUtils.getAddress(token);
+        if (me == null)
+        {
+            return new Result<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Double balance = service.addBalance(me, amount);
+        Map<String, Object> result = new HashMap<>();
+        result.put("address", me);
+        result.put("balance", balance);
+        return new Result<>(result);
     }
 }

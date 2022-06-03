@@ -1,16 +1,17 @@
 package chunson.cc.carket.service;
 
 import chunson.cc.carket.mapper.AccountMapper;
+import chunson.cc.carket.mapper.EventMapper;
 import chunson.cc.carket.model.Account;
-import chunson.cc.carket.utils.FileUtils;
+import chunson.cc.carket.model.TxResult;
 import chunson.cc.carket.utils.PswUtils;
 import chunson.cc.carket.utils.TokenUtils;
+import chunson.cc.carket.utils.VNTUtils;
+import com.google.gson.Gson;
 import com.sun.istack.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -24,8 +25,16 @@ import java.util.UUID;
 @Service
 public class AccountService
 {
-    @Autowired
-    private AccountMapper mapper;
+    private final AccountMapper mapper;
+    private final EventMapper eventMapper;
+    private final VNTUtils vntUtils;
+
+    public AccountService(AccountMapper mapper, EventMapper eventMapper, VNTUtils vntUtils)
+    {
+        this.mapper = mapper;
+        this.eventMapper = eventMapper;
+        this.vntUtils = vntUtils;
+    }
 
     public boolean existsAccount(@NotNull String username)
     {
@@ -109,17 +118,37 @@ public class AccountService
     }
 
     //只能查询自己的余额，并且需要登录
-    public double getBalance(String token)
+    public double getBalance(String address)
     {
-        @NotNull String address = TokenUtils.getAddress(token);
-        return mapper.getBalance(address);
+        String balanceStr = vntUtils.getBalance(address);
+        balanceStr = balanceStr.substring(1, balanceStr.length() - 1);
+        double balance = Double.parseDouble(balanceStr);
+
+//        if (balance.compareTo(mapper.getBalance(address)) != 0)
+//        {
+//            mapper.updateBalance(address, balance);
+//        }
+        return balance;
+    }
+
+    public double addBalance(String address, int amount)
+    {
+        String json = vntUtils.charge(address, amount);
+        TxResult result = new Gson().fromJson(json, TxResult.class);
+        String txHash = result.getTxHash();
+
+        double balance = Double.parseDouble((String) result.getData());
+        System.out.println(balance);
+//        mapper.updateBalance(address, balance);
+        return balance;
     }
 
     private static Map<String, String> newWallet()
     {
         String seed = UUID.randomUUID().toString();
         Map<String, String> map = new HashMap<>();
-        try {
+        try
+        {
             ECKeyPair ecKeyPair = Keys.createEcKeyPair();
             BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
 
@@ -132,7 +161,9 @@ public class AccountService
             map.put("address", "0x" + sAddress);
             map.put("privateKey", sPrivatekeyInHex);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
 
