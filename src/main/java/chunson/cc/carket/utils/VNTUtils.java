@@ -9,7 +9,7 @@ public interface VNTUtils
     //////////// 业务逻辑
     @FormUrlEncoded
     @POST("/charge")
-    String charge(@Field("to") String to, @Field("amount") long amount);
+    String charge(@Field("to") String to, @Field("amount") double amount);
 
     @FormUrlEncoded
     @POST("/setPrice")
@@ -25,7 +25,7 @@ public interface VNTUtils
 
     @FormUrlEncoded
     @POST("/transferVNT")
-    String transferVNT(@Field("to") String to, @Field("from") String from, @Field("amount") long amount);
+    String transferVNT(@Field("to") String to, @Field("from") String from, @Field("amount") double amount);
 
     @GET("/cid")
     String getCid(@Query("tokenId") long tokenId);

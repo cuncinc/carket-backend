@@ -131,12 +131,11 @@ public class AccountService
         return balance;
     }
 
-    public double addBalance(String address, int amount)
+    public double addBalance(String address, double amount)
     {
         String json = vntUtils.charge(address, amount);
         TxResult result = new Gson().fromJson(json, TxResult.class);
         String txHash = result.getTxHash();
-
         double balance = Double.parseDouble((String) result.getData());
         System.out.println(balance);
 //        mapper.updateBalance(address, balance);

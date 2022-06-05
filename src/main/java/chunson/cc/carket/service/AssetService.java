@@ -154,9 +154,8 @@ public class AssetService
         TxResult txResult = new Gson().fromJson(json, TxResult.class);
         long tokenId = Long.parseLong((String) txResult.getData());
         String txHash = txResult.getTxHash();
-        System.out.println(txHash);
-        System.out.println(tokenId);
-
+//        System.out.println(txHash);
+//        System.out.println(tokenId);
         json = vntUtils.getReceipt(txHash);
         TxReceipt receipt = new Gson().fromJson(json, TxReceipt.class);
         System.out.println(receipt.getStatus());

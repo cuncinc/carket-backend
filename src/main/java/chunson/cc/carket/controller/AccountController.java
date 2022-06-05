@@ -178,9 +178,9 @@ public class AccountController
     }
 
     @PutMapping("/accounts/me/balance")
-    public Result<?> charge(@NotNull @CookieValue("token") String token, @RequestBody Map<String, Integer> map)
+    public Result<?> charge(@NotNull @CookieValue("token") String token, @RequestBody Map<String, Double> map)
     {
-        Integer amount = map.get("amount");
+        Double amount = map.get("amount");
         if (amount == null)
         {
             return new Result<>(HttpStatus.BAD_REQUEST);
