@@ -21,7 +21,7 @@ public class Asset
     private String jsonCid;     //IPFS json文本的CID
     private String ipfsCid;       //文件的IPFS的CID
     private String label;       //标签
-    private Integer price;       //价格，只能是整数，货币是VNT
+    private Double price;       //价格，货币是VNT
     private Integer clickCount;  //点击数
     private Integer favoriteCount;  //点击数
     private String state;       //状态：1.待审核 2.未通过 3.已通过 4.未流通 5.在流通
@@ -128,7 +128,7 @@ public class Asset
         this.rate = rate;
     }
 
-    public void setPrice(Integer price)
+    public void setPrice(Double price)
     {
         this.price = price;
     }
@@ -168,7 +168,7 @@ public class Asset
         return label;
     }
 
-    public Integer getPrice()
+    public Double getPrice()
     {
         return price;
     }

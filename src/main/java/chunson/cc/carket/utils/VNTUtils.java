@@ -13,7 +13,7 @@ public interface VNTUtils
 
     @FormUrlEncoded
     @POST("/setPrice")
-    String setPrice(@Field("to") String to, @Field("tokenId") long tokenId, @Field("amount") long amount);
+    String setPrice(@Field("to") String to, @Field("tokenId") long tokenId, @Field("amount") String amount);
 
     @FormUrlEncoded
     @POST("/mint")

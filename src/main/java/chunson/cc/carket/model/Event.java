@@ -8,14 +8,14 @@ public class Event
     private String from;
     private String to;
     private Long tokenId;
-    private Integer amount;
+    private Double amount;
     private String type;
     private String txHash;
     private String timestamp;
 
     public static final String NullAddress = "0x0000000000000000000000000000000000000000";
 
-    public Event(String type, String from, String to, Long tokenId, Integer amount, String txHash)
+    public Event(String type, String from, String to, Long tokenId, Double amount, String txHash)
     {
         this.from = from;
         this.to = to;
@@ -65,12 +65,12 @@ public class Event
         this.tokenId = tokenId;
     }
 
-    public Integer getAmount()
+    public Double getAmount()
     {
         return amount;
     }
 
-    public void setAmount(Integer amount)
+    public void setAmount(Double amount)
     {
         this.amount = amount;
     }

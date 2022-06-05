@@ -33,7 +33,7 @@ public interface AssetMapper
     boolean updateDesc(Long aid, String desc);
 
     @Update("UPDATE Asset SET Price=#{price} WHERE AId=#{aid};")
-    boolean updatePrice(Long aid, int price);
+    boolean updatePrice(Long aid, double price);
 
     @Select("SELECT Asset.*, `User`.AvatarRoute, `User`.Username AS OwnerName FROM `User`, Asset WHERE `User`.Address = Asset.Owner AND State = \"在流通\" LIMIT #{start}, #{num};")
     List<ShowAsset> selectAssets(int start, int num);

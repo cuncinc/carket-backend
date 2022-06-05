@@ -16,7 +16,7 @@ public interface EventMapper
     public boolean insertEventWithTxHash(Event event);  //不能重名，否则启动失败
 
     @Insert("INSERT INTO `Event`(`From`, `To`, TokenId, Amount, Type) VALUES(#{from}, #{to}, #{tokenId}, #{amount}, #{type});")
-    public void insertEvent(String type, String from, String to, long tokenId, Integer amount);
+    public void insertEvent(String type, String from, String to, long tokenId, Double amount);
 
     @Select("SELECT * FROM `Event` WHERE TokenId=#{tokenId} ORDER BY `Timestamp` DESC;")
     public List<Event> selectEventsOfToken(long tokenId);

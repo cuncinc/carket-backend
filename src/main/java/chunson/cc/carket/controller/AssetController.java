@@ -2,6 +2,7 @@ package chunson.cc.carket.controller;
 
 import chunson.cc.carket.Exception.CreatorNotCorrespondException;
 import chunson.cc.carket.Exception.StateNotCorrespondException;
+import chunson.cc.carket.Exception.VNTMintFailedException;
 import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.model.Result;
 import chunson.cc.carket.service.AssetService;
@@ -78,6 +79,13 @@ public class AssetController
                 map.put("error", "can't mint assets");
                 return new Result<>(map, HttpStatus.FORBIDDEN);
             }
+        }
+        catch (VNTMintFailedException e)
+        {
+            Map<String, Object> map = new HashMap<>();
+            map.put("error", "VNT Chain can't mint");
+            map.put("e", e);
+            return new Result<>(map, HttpStatus.FORBIDDEN);
         }
         catch (Exception e)
         {
@@ -159,7 +167,7 @@ public class AssetController
             return new Result<>(HttpStatus.BAD_REQUEST);
         }
 
-        List<Map<String, String>> maps = assetService.getAssets(page, num);
+        List<Map<String, Object>> maps = assetService.getAssets(page, num);
         return new Result<>(maps);
     }
 
@@ -171,7 +179,7 @@ public class AssetController
         {
             return new Result<>(HttpStatus.UNAUTHORIZED);
         }
-        int price = Integer.parseInt(req.get("price"));
+        double price = Double.parseDouble(req.get("price"));
         if (assetService.upAsset(userAddress, aid, price))
             return new Result<>(HttpStatus.CREATED);
 
@@ -272,9 +280,9 @@ public class AssetController
     }
 
     @PutMapping("/assets/{aid}/price")//修改未上链后的艺术品的价格
-    public Result<?> setPrice(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, Object> req)
+    public Result<?> setPrice(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, Double> req)
     {
-        Integer price = (Integer) req.get("price");
+        Double price = req.get("price");
         if (price == null)
         {
             return new Result<>(HttpStatus.BAD_REQUEST);

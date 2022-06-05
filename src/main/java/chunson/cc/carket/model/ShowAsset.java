@@ -8,10 +8,10 @@ import java.util.Map;
 
 public class ShowAsset extends Asset
 {
-//    private String ownerAddress;
+    //    private String ownerAddress;
     private String ownerName;
     private String ownerAvatarRoute;
-//    private String creatorAddress;
+    //    private String creatorAddress;
     private String creatorName;
     private String creatorAvatarRoute;
 
@@ -69,9 +69,9 @@ public class ShowAsset extends Asset
         return null;
     }
 
-    public Map<String, String> marketing()
+    public Map<String, Object> marketing()
     {
-        Map<String, String> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("aid", getAid() + "");
         map.put("name", getName());
         map.put("desc", getDesc());
@@ -85,10 +85,10 @@ public class ShowAsset extends Asset
         map.put("creatorName", creatorName);
         map.put("ownerAvatar", getOwnerAvatar());
         map.put("creatorAvatar", getCreatorAvatar());
-        map.put("favoriteCount", getFavoriteCount()+"");
+        map.put("favoriteCount", getFavoriteCount() + "");
         map.put("state", getState());
-        map.put("price", getPrice()+"");
-        map.put("rate", getRate()+"");
+        map.put("price", getPrice());
+        map.put("rate", getRate() + "");
 
         return map;
     }

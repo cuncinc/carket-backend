@@ -2,6 +2,7 @@ package chunson.cc.carket.service;
 
 import chunson.cc.carket.Exception.CreatorNotCorrespondException;
 import chunson.cc.carket.Exception.StateNotCorrespondException;
+import chunson.cc.carket.Exception.VNTMintFailedException;
 import chunson.cc.carket.mapper.AssetMapper;
 import chunson.cc.carket.mapper.EventMapper;
 import chunson.cc.carket.mapper.UserMapper;
@@ -40,10 +41,10 @@ public class AssetService
         return assetMapper.getAssetByAid(aid);
     }
 
-    public List<Map<String, String>> getAssets(@NotNull int page, int num)
+    public List<Map<String, Object>> getAssets(@NotNull int page, int num)
     {
         List<ShowAsset> assets = assetMapper.selectAssets((page - 1) * num, num);
-        List<Map<String, String>> maps = new ArrayList<>();
+        List<Map<String, Object>> maps = new ArrayList<>();
         for (ShowAsset obj : assets)
         {
             maps.add(obj.marketing());
@@ -65,7 +66,7 @@ public class AssetService
         return asset;
     }
 
-    public List<Map<String, String>> getAssetsOfUser(@NotNull String whose, @NotNull String which, @NotNull boolean isMe)
+    public List<Map<String, Object>> getAssetsOfUser(@NotNull String whose, @NotNull String which, @NotNull boolean isMe)
     {
         List<ShowAsset> assets = null;
         if (which.equals("owned"))
@@ -109,7 +110,7 @@ public class AssetService
                 }
             }
 
-            List<Map<String, String>> maps = new ArrayList<>();
+            List<Map<String, Object>> maps = new ArrayList<>();
             for (ShowAsset obj : assets)
             {
                 maps.add(obj.marketing());
@@ -137,7 +138,7 @@ public class AssetService
         return null;
     }
 
-    public boolean mintAsset(String address, Long aid, int rate) throws IOException
+    public boolean mintAsset(String address, Long aid, int rate) throws IOException, VNTMintFailedException
     {
         if (!assetMapper.checkAidCreator(aid, address))
             return false;
@@ -155,12 +156,19 @@ public class AssetService
         String txHash = txResult.getTxHash();
         System.out.println(txHash);
         System.out.println(tokenId);
+
+        json = vntUtils.getReceipt(txHash);
+        TxReceipt receipt = new Gson().fromJson(json, TxReceipt.class);
+        System.out.println(receipt.getStatus());
+        if (receipt.getStatus().equals("0x0"))
+        {
+            throw new VNTMintFailedException();
+        }
         Event event = new Event("铸造", Event.NullAddress, address, tokenId, null, txHash);
         eventMapper.insertEventWithTxHash(event);
         asset.setState("已上链");
         asset.setJsonCid(jsonCid);
         asset.setTokenId(tokenId);
-
         return assetMapper.mintAsset(asset);
     }
 
@@ -193,27 +201,27 @@ public class AssetService
         }
     }
 
-    public boolean updatePrice(String address, Long aid, int amount, boolean isUp)
+    public boolean updatePrice(String address, Long aid, double amount, boolean isUp)
     {
 //        System.out.println("amount: " + amount);
         if (!checkOwner(address, aid)) return false;
         Asset asset = assetMapper.getAssetByAid(aid);
         long tokenId = asset.getTokenId();
-        String json = vntUtils.setPrice(address, tokenId, amount);
+        String json = vntUtils.setPrice(address, tokenId, amount + "");
 //        System.out.println(json);
         TxResult result = new Gson().fromJson(json, TxResult.class);
-        amount = Integer.parseInt((String) result.getData());
+        double price = Double.parseDouble((String) result.getData());
 //        System.out.println("newPrice: " + amount);
         if (!isUp)
         {
             String txHash = result.getTxHash();
-            Event event = new Event("更新价格", address, null, tokenId, amount, txHash);
+            Event event = new Event("更新价格", address, null, tokenId, price, txHash);
             eventMapper.insertEventWithTxHash(event);
         }
-        return assetMapper.updatePrice(aid, amount);
+        return assetMapper.updatePrice(aid, price);
     }
 
-    public boolean upAsset(String address, Long aid, int price)
+    public boolean upAsset(String address, Long aid, double price)
     {
         if (checkOwner(address, aid))
         {
