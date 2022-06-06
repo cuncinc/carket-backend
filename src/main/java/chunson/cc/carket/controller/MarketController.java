@@ -1,17 +1,13 @@
 package chunson.cc.carket.controller;
 
 import chunson.cc.carket.Exception.*;
-import chunson.cc.carket.model.Asset;
 import chunson.cc.carket.model.Result;
+import chunson.cc.carket.service.AccountService;
 import chunson.cc.carket.service.MarketService;
 import chunson.cc.carket.utils.TokenUtils;
-import com.mysql.cj.util.StringUtils;
-import com.sun.istack.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +17,12 @@ import java.util.Map;
 public class MarketController
 {
     private final MarketService service;
+    private final AccountService accountService;
 
-    public MarketController(MarketService service)
+    public MarketController(MarketService service, AccountService accountService)
     {
         this.service = service;
+        this.accountService = accountService;
     }
 
     @GetMapping("/assets")
@@ -50,12 +48,27 @@ public class MarketController
     }
 
     @PostMapping("/assets/{aid}/buy")
-    public Result<?> buy(@CookieValue("token") String token, @PathVariable long aid)
+    public Result<?> buy(@CookieValue("token") String token, @PathVariable long aid, @RequestBody Map<String, String> req)
     {
         String me = TokenUtils.getAddress(token);
+        String password = req.get("password");
         if (null == me)
         {
-            return new Result<>(HttpStatus.UNAUTHORIZED);
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "没有token");
+            return new Result<>(map, HttpStatus.UNAUTHORIZED);
+        }
+        else if (password == null)
+        {
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "没有密码");
+            return new Result<>(map, HttpStatus.BAD_REQUEST);
+        }
+        else if (!accountService.checkAccount(me, password))
+        {
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "密码错误");
+            return new Result<>(map, HttpStatus.UNAUTHORIZED);
         }
 
         try
